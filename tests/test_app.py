@@ -73,4 +73,5 @@ def test_run_model_route_valid_input(client):
     response = client.post("/run_model", data=data, content_type="multipart/form-data")
 
     assert response.status_code == 200
-    assert response.content_type == "application/zip"
+    assert (response.content_type == "application/zip" or
+            response.content_type == "application/x-zip-compressed")

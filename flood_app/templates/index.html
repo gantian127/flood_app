@@ -1,0 +1,24 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flood Simulator</title>
+</head>
+<body>
+    <h1>Flood Simulator</h1>
+    <form action="/run_model" method="post" enctype="multipart/form-data">
+        <label for="user_name">User name:</label><br>
+        <input type="text" id="user_name" name="user_name"><br>
+        <br>
+        <label for="dem_file">DEM file:</label><br>
+        <input type="file" id="dem_file" name="dem_file"><br><br>
+
+        <label for="config_file">Config file:</label><br>
+        <input type="file" id="config_file" name="config_file"><br><br>
+
+        <input type="submit" value="Run Model">
+    </form>
+</body>
+</html>

@@ -32,10 +32,18 @@ user interface to run the overland flow simulation.
   :width: 300
   :alt: user interface
 
-Docker
-------
+You can download the example
+`DEM file <https://github.com/gantian127/flood_app/blob/master/tests/test_files/geer_canyon.txt>`_
+and `Config file <https://github.com/gantian127/flood_app/blob/master/tests/test_files/config_file.toml>`_ for testing.
+The response will download a zip file which includes the model outputs. (Please note: the web browser may block the download of the zip file as an insecure file.)
 
-To build a new docker image that will be a flood_app server,
+Use Docker
+------
+**Option1: Build docker image with a Docker file**
+
+To build a new docker image with a
+`Docker file <https://github.com/gantian127/flood_app/blob/master/Dockerfile>`_
+that will be a flood_app server,
 
 .. code::
 
@@ -47,6 +55,20 @@ After building, run the server,
 .. code::
 
     docker run -it -p 80:80 flood_app
+
+**Option2: Pull docker image from the Docker Hub**
+
+To pull the docker image that will be a flood_app server,
+
+.. code::
+
+    docker pull gantian127/flood_app:latest
+
+After building, run the server,
+
+.. code::
+
+    docker run -it -p 80:80 gantian127/flood_app
 
 Once running, you can open a web browser and go to http://0.0.0.0, which will show a
 user interface to run the overland flow simulation.

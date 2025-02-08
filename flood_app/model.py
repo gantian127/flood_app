@@ -28,6 +28,8 @@ except ModuleNotFoundError:
 import rasterio
 from tqdm import trange
 import pandas as pd
+import numpy as np
+import json
 
 from landlab.io import read_esri_ascii, write_esri_ascii
 from landlab.components import OverlandFlow, SoilInfiltrationGreenAmpt
@@ -219,15 +221,31 @@ class FloodSimulator:
                 #     discharge
                 # )
 
-            # save surface water depth at each time step
-            write_esri_ascii(
-                os.path.join(
-                    output_folder, "surface_water_depth_{}.asc".format(time_slice)
-                ),
-                self.model_grid,
-                "surface_water__depth",
-                clobber=True,
-            )
+            # save surface water depth at each time step as ascii file
+            # write_esri_ascii(
+            #     os.path.join(
+            #         output_folder, "surface_water_depth_{}.asc".format(time_slice)
+            #     ),
+            #     self.model_grid,
+            #     "surface_water__depth",
+            #     clobber=True,
+            # )
+
+            # save surface water depth at each time step as json file
+            surf_water_file_path = os.path.join(output_folder,
+                                                f"surface_water_depth_{time_slice}.json")
+            data = []
+            cell_size = self.model_grid.spacing[0]
+            for i in np.arange(0, len(self.model_grid.at_node["surface_water__depth"])):
+                x, y = np.unravel_index(i, self.model_grid.shape)
+                data.append({
+                    "x": x * cell_size,
+                    "y": y * cell_size,
+                    "z": self.model_grid.at_node["surface_water__depth"][i]
+                })
+
+            with open(surf_water_file_path, 'w') as file:
+                json.dump(data, file, indent=4)
 
             # # save the max water depth at each time step
             # self.model_grid.at_node['max_surface_water__depth'] = np.maximum(

@@ -1,79 +1,148 @@
 """
-unit tests for the app
+Unit tests for flooding web app (async version)
 """
 
 import pytest
+import json
+import uuid
+
 from flood_app import create_app
 
 
 @pytest.fixture
 def client():
+    """Set up a test client for the Flask app"""
     app = create_app()
-    app.testing = True
-    client = app.test_client()
-    yield client
+    app.config["TESTING"] = True
+    with app.test_client() as client:
+        yield client
 
 
-def test_index_route(client):
-    response = client.get("/")
-    assert response.status_code == 200
-    assert b"<form" in response.data
+@pytest.fixture(scope="module")
+def valid_uuid():
+    """Create an uuid for valid request and check its status"""
+    return str(uuid.uuid4())
 
 
-def test_run_model_route_invalid_user_name(client):
-    data = {"user_name": ""}
-    response = client.post("/run_model", data=data)
-
-    assert response.status_code == 400
-    assert b"Please provide a valid user name" in response.data
+def test_app_creation(client):
+    """Ensure the Flask app initializes correctly"""
+    assert client is not None
 
 
-# test invalid dem file
-def test_run_model_route_invalid_dem_file(client):
-    data = {
-        "user_name": "test_user",
-        "dem_file": (open("./test_files/wrong_dem.asc", "rb"), "wrong_dem.asc"),
-        "config_file": (
-            open("./test_files/config_file.toml", "rb"),
-            "config_file.toml",
-        ),
-    }
-    response = client.post("/run_model", data=data, content_type="multipart/form-data")
+def test_submit_simulation_valid_request_(client, valid_uuid):
+    """Test submitting a valid request"""
+    with open("./test_files/test_request_json_valid.json") as fp:
+        request_data = json.load(fp)
+    request_data["simulationId"] = valid_uuid
 
-    assert response.status_code == 400
-    assert b"Please upload a valid dem file" in response.data
-
-
-# test invalid config file
-def test_run_model_route_invalid_config_file(client):
-    data = {
-        "user_name": "test_user",
-        "dem_file": (open("./test_files/geer_canyon.txt", "rb"), "geer_canyon.txt"),
-        "config_file": (
-            open("./test_files/config_file.toml", "rb"),
-            "wrong_config.asc",
-        ),
-    }
-    response = client.post("/run_model", data=data, content_type="multipart/form-data")
-
-    assert response.status_code == 400
-    assert b"Please provide a valid config file." in response.data
-
-
-# test valid model run
-def test_run_model_route_valid_input(client):
-    data = {
-        "user_name": "test_user",
-        "dem_file": (open("./test_files/geer_canyon.txt", "rb"), "geer_canyon.txt"),
-        "config_file": (
-            open("./test_files/config_file.toml", "rb"),
-            "config_file.toml",
-        ),
-    }
-    response = client.post("/run_model", data=data, content_type="multipart/form-data")
+    response = client.post(
+        "/submit_simulation",
+        data=json.dumps(request_data),
+        content_type="application/json",
+    )
 
     assert response.status_code == 200
     assert (
-        response.content_type == "application/zip"
-        or response.content_type == "application/x-zip-compressed"
+        f"Request {request_data['simulationId']} is received."
+        in response.json["message"]
+    )
+
+
+def test_submit_simulation_invalid_id(client):
+    """Test submitting a simulation with an invalid UUID"""
+    request_data = {
+        "simulationId": "invalid-uuid",
+        "map": "some map data",
+        "timeout": 100000,
+    }
+    response = client.post(
+        "/submit_simulation",
+        data=json.dumps(request_data),
+        content_type="application/json",
+    )
+
+    assert response.status_code == 400
+    assert "Please provide a valid simulation ID." in response.json["error"]
+
+
+def test_submit_simulation_existing_id(client, valid_uuid):
+    """Test submitting a simulation with an existing UUID"""
+
+    request_data = {
+        "simulationId": valid_uuid,
+        "map": "some map data",
+        "timeout": 100000,
+    }
+    response = client.post(
+        "/submit_simulation",
+        data=json.dumps(request_data),
+        content_type="application/json",
+    )
+
+    assert response.status_code == 400
+    assert "Simulation ID already exists." in response.json["error"]
+
+
+def test_submit_simulation_missing_map(client, tmp_path):
+    """Test submitting a request with missing map data"""
+    simulation_id = str(uuid.uuid4())  # Generate a valid UUID
+    request_data = {
+        "simulationId": simulation_id,
+        "map": "",
+        "timeout": 100000,
+    }
+    response = client.post(
+        "/submit_simulation",
+        data=json.dumps(request_data),
+        content_type="application/json",
+    )
+
+    assert response.status_code == 400
+    assert "Missing valid map data." in response.json["error"]
+
+
+def test_submit_simulation_invalid_map_data(client):
+    """Test submitting a request with invalid map data"""
+    simulation_id = str(uuid.uuid4())  # Generate a UUID
+    request_data = {
+        "simulationId": simulation_id,
+        "map": "invalid_map_data",
+        "timeout": 100000,
+    }
+    response = client.post(
+        "/submit_simulation",
+        data=json.dumps(request_data),
+        content_type="application/json",
+    )
+
+    assert response.status_code == 400
+    assert "Invalid map json string" in response.json["error"]
+
+
+def test_check_status_not_found_id(client):
+    """Test checking the status of a non-existing simulation id"""
+    simulation_id = str(uuid.uuid4())
+    response = client.get(f"/check_status/{simulation_id}")
+
+    assert response.status_code == 400
+    assert "Simulation ID not found." in response.json["error"]
+
+
+def test_check_status_invalid_id(client):
+    """Test checking the status of an invalid uuid"""
+    simulation_id = "invalid_id"
+    response = client.get(f"/check_status/{simulation_id}")
+
+    assert response.status_code == 400
+    assert "Please provide a valid simulation ID." in response.json["error"]
+
+
+def test_check_status_valid_id(client, valid_uuid):
+    """Test checking the status of a valid simulation id"""
+    response = client.get(f"/check_status/{valid_uuid}")
+
+    assert response.status_code == 200
+    assert (
+        "processing" in response.json["message"]
+        or "complete" in response.json["message"]
     )

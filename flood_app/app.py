@@ -67,7 +67,8 @@ def create_app():
     # Route to handle submission
     @app.route("/submit_simulation", methods=["POST"])
     def submit_simulation():
-        # # Check for Authorization header #TODO enable author check
+        # TODO enable author check and timeout setting
+        # # Check for Authorization header
         # auth_header = request.headers.get("Authorization")
         # if not auth_header or not auth_header.startswith("Bearer "):
         #     return jsonify({"error": "Unauthorized"}), 401
@@ -85,7 +86,7 @@ def create_app():
 
             # check map data
             if not map_data:
-                return jsonify({"error": "Please provide a valid map data."}), 400
+                return jsonify({"error": "Missing valid map data."}), 400
 
             # check simulation id
             try:
@@ -125,12 +126,23 @@ def create_app():
         os.mkdir(output_folder)
 
         # create ascii files
-        dem_ascii_path, mannings_ascii_path = create_ascii_files(
-            map_data,
-            user_folder,
-            json_str=True,
-            delineation=False,
-        )
+        try:
+            dem_ascii_path, mannings_ascii_path = create_ascii_files(
+                map_data,
+                user_folder,
+                json_str=True,
+                delineation=False,
+            )
+        except Exception as e:
+            return (
+                jsonify(
+                    {
+                        "error": f"Request {simulation_id} is rejected. "
+                        f"Invalid map json string: {e}"
+                    }
+                ),
+                400,
+            )
 
         # create config file
         config_template_path = os.path.join(current_app.root_path, "config_file.toml")

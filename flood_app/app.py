@@ -7,17 +7,11 @@ app = create_app()
 app.run(debug=True, port=5001)
 """
 
-from flask import Flask, render_template, request, jsonify, send_file, current_app
+from flask import Flask, request, jsonify, send_file, current_app
 from .model import FloodSimulator
 import os
 
-try:
-    import tomllib
-except ModuleNotFoundError:
-    import tomli as tomllib
 import shutil
-
-import time
 import toml
 import uuid
 import threading
@@ -46,7 +40,7 @@ def create_app():
 
             # zip output files
             output_folder = os.path.join(user_folder, "output")
-            zip_file_path = os.path.join(user_folder, f"output")
+            zip_file_path = os.path.join(user_folder, "output")
             shutil.make_archive(zip_file_path, "zip", output_folder)
 
             # update status as failed
@@ -195,7 +189,7 @@ def create_app():
             elif "failed" in status:
                 return jsonify({"error": f"Request {simulation_id} is {status}"}), 200
             elif status == "complete":
-                zip_output_path = os.path.join(user_folder, f"output.zip")
+                zip_output_path = os.path.join(user_folder, "output.zip")
                 if os.path.isfile(zip_output_path):
                     download = request.args.get("download", "false").lower() == "true"
                     if download:

@@ -31,7 +31,7 @@ import pandas as pd
 import numpy as np
 import json
 
-from landlab.io import read_esri_ascii, write_esri_ascii
+from landlab.io import read_esri_ascii
 from landlab.components import OverlandFlow, SoilInfiltrationGreenAmpt
 
 

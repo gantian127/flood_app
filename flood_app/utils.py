@@ -35,26 +35,26 @@ def create_ascii_files(dem_info, output_folder, json_str=False, delineation=Fals
     if json_str:
         data = dem_info
     else:
-        with open(dem_info, 'r') as file:
+        with open(dem_info, "r") as file:
             data = json.load(file)[0]
 
     # get row, col and cell size info
-    ncols = data['verticalSquares']
-    nrows = data['horizontalSquares']
-    cellsize = round(111320 * data['squareSize'], 1)
+    ncols = data["verticalSquares"]
+    nrows = data["horizontalSquares"]
+    cellsize = round(111320 * data["squareSize"], 1)
     node_numbers = ncols * nrows
 
     # define empty arrays
-    entity = data['entities']
+    entity = data["entities"]
     elevation = np.empty([nrows, ncols])
-    land_type = np.empty([nrows, ncols], dtype='<U15')
+    land_type = np.empty([nrows, ncols], dtype="<U15")
 
     # get data from json string
     for i in np.arange(0, node_numbers):
-        x = entity[i]['metadata']['colorResult']['x']
-        y = entity[i]['metadata']['colorResult']['y']
-        elevation[x][y] = entity[i]['elevation']
-        land_type[x][y] = entity[i]['metadata']['colorResult']['colorData'][0]['name']
+        x = entity[i]["metadata"]["colorResult"]["x"]
+        y = entity[i]["metadata"]["colorResult"]["y"]
+        elevation[x][y] = entity[i]["elevation"]
+        land_type[x][y] = entity[i]["metadata"]["colorResult"]["colorData"][0]["name"]
 
     # define header info
     header = {
@@ -75,20 +75,24 @@ def create_ascii_files(dem_info, output_folder, json_str=False, delineation=Fals
         elevation = watershed_delineation(elevation, cellsize)
 
     # save elevation data
-    elev_path = os.path.join(output_folder, 'elevation.txt')
+    elev_path = os.path.join(output_folder, "elevation.txt")
     np.savetxt(
-        elev_path, np.flipud(elevation), header=os.linesep.join(header_lines),
-        comments=""
+        elev_path,
+        np.flipud(elevation),
+        header=os.linesep.join(header_lines),
+        comments="",
     )
 
     # create and save manning's n data
     replace_values = np.vectorize(MANNING_MAPPING.get)
     mannings_n = replace_values(land_type)
 
-    mannings_n_path = os.path.join(output_folder, 'mannings_n.txt')
+    mannings_n_path = os.path.join(output_folder, "mannings_n.txt")
     np.savetxt(
-        mannings_n_path, np.flipud(mannings_n), header=os.linesep.join(header_lines),
-        comments=""
+        mannings_n_path,
+        np.flipud(mannings_n),
+        header=os.linesep.join(header_lines),
+        comments="",
     )
 
     return elev_path, mannings_n_path
@@ -105,19 +109,25 @@ def watershed_delineation(elevation, cell_size, no_data=-9999):
     :return: 2D array of DEM data which includes a delineated watershed
     """
 
-
     # define model grid and data field
     grid_shape = elevation.shape
     model_grid = RasterModelGrid(grid_shape, xy_spacing=cell_size)
-    dem_field = model_grid.add_field("topographic__elevation", elevation.astype('float'))
-    model_grid.status_at_node[dem_field < 0] = model_grid.BC_NODE_IS_CLOSED  # water area
+    dem_field = model_grid.add_field(
+        "topographic__elevation", elevation.astype("float")
+    )
+    model_grid.status_at_node[
+        dem_field < 0
+    ] = model_grid.BC_NODE_IS_CLOSED  # water area
 
     # flow accumulation
-    fa = FlowAccumulator(model_grid, method='Steepest',
-                         flow_director='FlowDirectorSteepest',
-                         depression_finder='LakeMapperBarnes',
-                         redirect_flow_steepest_descent=True,
-                         reaccumulate_flow=True)
+    fa = FlowAccumulator(
+        model_grid,
+        method="Steepest",
+        flow_director="FlowDirectorSteepest",
+        depression_finder="LakeMapperBarnes",
+        redirect_flow_steepest_descent=True,
+        reaccumulate_flow=True,
+    )
     fa.run_one_step()
 
     # set up channel profiler

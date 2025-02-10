@@ -28,14 +28,14 @@ from .utils import create_ascii_files
 def create_app():
     app = Flask(__name__, template_folder="templates")
 
-    def run_simulation(user_folder,time_out):  # TODO add time_out checking
+    def run_simulation(user_folder, time_out):  # TODO add time_out checking
         # update status as processing
         status_file_path = os.path.join(user_folder, "status.txt")
-        with open(status_file_path, 'w') as status_file:
-            status_file.write('processing')
+        with open(status_file_path, "w") as status_file:
+            status_file.write("processing")
 
         # get model parameters
-        config_file_path = os.path.join(user_folder, 'config_file.toml')
+        config_file_path = os.path.join(user_folder, "config_file.toml")
         with open(config_file_path, mode="r") as fp:
             args = toml.load(fp)
 
@@ -50,11 +50,11 @@ def create_app():
             shutil.make_archive(zip_file_path, "zip", output_folder)
 
             # update status as failed
-            status = 'complete'
+            status = "complete"
 
         except Exception as e:
             # update status as failed
-            status = f'failed. Error info: {e}'
+            status = f"failed. Error info: {e}"
 
         finally:
             # update the status file, whether success or failure
@@ -99,7 +99,7 @@ def create_app():
         # prepare simulation folder
         # make upload folder
         user_uploads = os.path.abspath(
-            os.path.join(current_app.root_path, "..", 'user_upload')
+            os.path.join(current_app.root_path, "..", "user_upload")
         )
         if not os.path.isdir(user_uploads):
             os.mkdir(user_uploads)
@@ -107,8 +107,15 @@ def create_app():
         # make user folder
         user_folder = os.path.join(user_uploads, simulation_id)
         if os.path.isdir(user_folder):
-            return jsonify({"error": f"Request {simulation_id} is rejected. "
-                                     f"Simulation ID already exists."}), 400
+            return (
+                jsonify(
+                    {
+                        "error": f"Request {simulation_id} is rejected. "
+                        f"Simulation ID already exists."
+                    }
+                ),
+                400,
+            )
         os.mkdir(user_folder)
 
         # create output folder
@@ -119,24 +126,27 @@ def create_app():
 
         # create ascii files
         dem_ascii_path, mannings_ascii_path = create_ascii_files(
-            map_data, user_folder, json_str=True, delineation=False,
+            map_data,
+            user_folder,
+            json_str=True,
+            delineation=False,
         )
 
         # create config file
-        config_template_path = os.path.join(current_app.root_path, 'config_file.toml')
+        config_template_path = os.path.join(current_app.root_path, "config_file.toml")
         with open(config_template_path, mode="r") as fp:
             args = toml.load(fp)
         args["terrain"]["grid_file"] = dem_ascii_path
         args["output"]["output_folder"] = output_folder
 
-        config_file_path = os.path.join(user_folder, 'config_file.toml')
-        with open(config_file_path, 'w') as config_file:
+        config_file_path = os.path.join(user_folder, "config_file.toml")
+        with open(config_file_path, "w") as config_file:
             toml.dump(args, config_file)
 
         # create status file
         status_file_path = os.path.join(user_folder, "status.txt")
-        with open(status_file_path, 'w') as status_file:
-            status_file.write('wait in queue')
+        with open(status_file_path, "w") as status_file:
+            status_file.write("wait in queue")
 
         # submit job
         thread = threading.Thread(target=run_simulation, args=(user_folder, timeout))
@@ -156,30 +166,35 @@ def create_app():
 
         # check status of simulation
         user_uploads = os.path.abspath(
-            os.path.join(current_app.root_path, "..", 'user_upload')
+            os.path.join(current_app.root_path, "..", "user_upload")
         )
         user_folder = os.path.join(user_uploads, simulation_id)
 
         if os.path.isdir(user_folder):
-
-            status_file_path = os.path.join(user_folder,"status.txt")
-            with open(status_file_path, 'r') as f:
+            status_file_path = os.path.join(user_folder, "status.txt")
+            with open(status_file_path, "r") as f:
                 status = f.read()
 
-            if status in ['waiting in queue', 'processing']:
-                return jsonify(
-                    {"message": f"Request {simulation_id} is {status}."}), 200
-            elif 'failed' in status:
-                return jsonify(
-                    {"message": f"Request {simulation_id} is {status}"}), 200
-            elif status == 'complete':
+            if status in ["waiting in queue", "processing"]:
+                return (
+                    jsonify({"message": f"Request {simulation_id} is {status}."}),
+                    200,
+                )
+            elif "failed" in status:
+                return jsonify({"error": f"Request {simulation_id} is {status}"}), 200
+            elif status == "complete":
                 zip_output_path = os.path.join(user_folder, f"output.zip")
                 if os.path.isfile(zip_output_path):
-                    download = request.args.get('download', 'false').lower() == 'true'
+                    download = request.args.get("download", "false").lower() == "true"
                     if download:
                         return send_file(f"{zip_output_path}", as_attachment=True)
                     else:
-                        return jsonify({"message": f"Request {simulation_id} is complete."}), 200
+                        return (
+                            jsonify(
+                                {"message": f"Request {simulation_id} is complete."}
+                            ),
+                            200,
+                        )
 
         else:
             return jsonify({"error": "Simulation ID not found."}), 400

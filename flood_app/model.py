@@ -184,7 +184,6 @@ class FloodSimulator:
 
         # run model simulation
         for time_slice in trange(time_step, model_run_time + time_step, time_step):
-
             while elapsed_time < time_slice:
                 # get adaptive time step
                 overland_flow.dt = min(overland_flow.calc_time_step(), time_step)
@@ -232,19 +231,22 @@ class FloodSimulator:
             # )
 
             # save surface water depth at each time step as json file
-            surf_water_file_path = os.path.join(output_folder,
-                                                f"surface_water_depth_{time_slice}.json")
+            surf_water_file_path = os.path.join(
+                output_folder, f"surface_water_depth_{time_slice}.json"
+            )
             data = []
             cell_size = self.model_grid.spacing[0]
             for i in np.arange(0, len(self.model_grid.at_node["surface_water__depth"])):
                 x, y = np.unravel_index(i, self.model_grid.shape)
-                data.append({
-                    "x": x * cell_size,
-                    "y": y * cell_size,
-                    "z": self.model_grid.at_node["surface_water__depth"][i]
-                })
+                data.append(
+                    {
+                        "x": x * cell_size,
+                        "y": y * cell_size,
+                        "z": self.model_grid.at_node["surface_water__depth"][i],
+                    }
+                )
 
-            with open(surf_water_file_path, 'w') as file:
+            with open(surf_water_file_path, "w") as file:
                 json.dump(data, file, indent=4)
 
             # # save the max water depth at each time step

@@ -8,3 +8,5 @@ flask-cors
 landlab >= 2
 rasterio
 tqdm
+toml
+uuid

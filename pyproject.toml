@@ -42,6 +42,8 @@ dependencies = [
     "landlab >= 2",
     "rasterio",
     "tqdm",
+    "toml",
+    "uuid",
 ]
 dynamic = ["readme", "version"]
 

@@ -16,6 +16,7 @@ import toml
 import uuid
 import threading
 
+from .settings import API_KEY
 from .utils import create_ascii_files
 
 
@@ -61,15 +62,14 @@ def create_app():
     # Route to handle submission
     @app.route("/submit_simulation", methods=["POST"])
     def submit_simulation():
-        # TODO enable author check and timeout setting
-        # # Check for Authorization header
-        # auth_header = request.headers.get("Authorization")
-        # if not auth_header or not auth_header.startswith("Bearer "):
-        #     return jsonify({"error": "Unauthorized"}), 401
-        #
-        # api_key = auth_header.split("Bearer ")[1]
-        # if api_key != "API_KEY":  # Replace with actual API key
-        #     return jsonify({"error": "Invalid API Key"}), 403
+        # Check for Authorization header
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return jsonify({"error": "Unauthorized"}), 401
+
+        api_key = auth_header.split("Bearer ")[1]
+        if api_key != API_KEY:
+            return jsonify({"error": "Invalid API Key"}), 403
 
         # parse JSON data
         try:

@@ -6,7 +6,7 @@ import pytest
 import json
 import uuid
 
-from flood_app import create_app
+from flood_app import create_app, settings
 
 
 @pytest.fixture
@@ -23,13 +23,33 @@ def valid_uuid():
     """Create an uuid for valid request and check its status"""
     return str(uuid.uuid4())
 
+@pytest.fixture()
+def headers():
+    """Create valid header info with API_KEY"""
+    return {"Authorization": f"Bearer {settings.API_KEY}"}
+
 
 def test_app_creation(client):
     """Ensure the Flask app initializes correctly"""
     assert client is not None
 
 
-def test_submit_simulation_valid_request_(client, valid_uuid):
+def test_submit_simulation_unauthorized(client):
+    """Test submitting a simulation no Authorization header is provided."""
+    response = client.post("/submit_simulation", json={})
+    assert response.status_code == 401
+    assert response.json["error"] == "Unauthorized"
+
+
+def test_submit_simulation_forbidden(client):
+    """Test submitting a simulation with an invalid API key."""
+    headers = {"Authorization": "Bearer INVALID_KEY"}
+    response = client.post("/submit_simulation", headers=headers, json={})
+    assert response.status_code == 403
+    assert response.json["error"] == "Invalid API Key"
+
+
+def test_submit_simulation_valid_request_(client, valid_uuid, headers):
     """Test submitting a valid request"""
     with open("./test_files/test_request_json_valid.json") as fp:
         request_data = json.load(fp)
@@ -37,6 +57,7 @@ def test_submit_simulation_valid_request_(client, valid_uuid):
 
     response = client.post(
         "/submit_simulation",
+        headers=headers,
         data=json.dumps(request_data),
         content_type="application/json",
     )
@@ -48,7 +69,7 @@ def test_submit_simulation_valid_request_(client, valid_uuid):
     )
 
 
-def test_submit_simulation_invalid_id(client):
+def test_submit_simulation_invalid_id(client, headers):
     """Test submitting a simulation with an invalid UUID"""
     request_data = {
         "simulationId": "invalid-uuid",
@@ -57,6 +78,7 @@ def test_submit_simulation_invalid_id(client):
     }
     response = client.post(
         "/submit_simulation",
+        headers=headers,
         data=json.dumps(request_data),
         content_type="application/json",
     )
@@ -65,7 +87,7 @@ def test_submit_simulation_invalid_id(client):
     assert "Please provide a valid simulation ID." in response.json["error"]
 
 
-def test_submit_simulation_existing_id(client, valid_uuid):
+def test_submit_simulation_existing_id(client, valid_uuid, headers):
     """Test submitting a simulation with an existing UUID"""
 
     request_data = {
@@ -75,6 +97,7 @@ def test_submit_simulation_existing_id(client, valid_uuid):
     }
     response = client.post(
         "/submit_simulation",
+        headers=headers,
         data=json.dumps(request_data),
         content_type="application/json",
     )
@@ -83,7 +106,7 @@ def test_submit_simulation_existing_id(client, valid_uuid):
     assert "Simulation ID already exists." in response.json["error"]
 
 
-def test_submit_simulation_missing_map(client, tmp_path):
+def test_submit_simulation_missing_map(client, headers):
     """Test submitting a request with missing map data"""
     simulation_id = str(uuid.uuid4())  # Generate a valid UUID
     request_data = {
@@ -93,6 +116,7 @@ def test_submit_simulation_missing_map(client, tmp_path):
     }
     response = client.post(
         "/submit_simulation",
+        headers=headers,
         data=json.dumps(request_data),
         content_type="application/json",
     )
@@ -101,7 +125,7 @@ def test_submit_simulation_missing_map(client, tmp_path):
     assert "Missing valid map data." in response.json["error"]
 
 
-def test_submit_simulation_invalid_map_data(client):
+def test_submit_simulation_invalid_map_data(client, headers):
     """Test submitting a request with invalid map data"""
     simulation_id = str(uuid.uuid4())  # Generate a UUID
     request_data = {
@@ -111,6 +135,7 @@ def test_submit_simulation_invalid_map_data(client):
     }
     response = client.post(
         "/submit_simulation",
+        headers=headers,
         data=json.dumps(request_data),
         content_type="application/json",
     )

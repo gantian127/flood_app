@@ -1,6 +1,6 @@
 {
 "simulationId": "",
-"timeout": 1700000000,
+"timeout": 300,
 "map":
     {
         "center": {

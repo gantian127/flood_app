@@ -7,15 +7,16 @@ app = create_app()
 app.run(debug=True, port=5001)
 """
 
-from flask import Flask, request, jsonify, send_file, current_app
-from .model import FloodSimulator
-import os
 
+import os
+import time
 import shutil
 import toml
 import uuid
 import threading
 
+from flask import Flask, request, jsonify, send_file, current_app
+from .model import FloodSimulator
 from .settings import API_KEY
 from .utils import create_ascii_files
 
@@ -23,7 +24,10 @@ from .utils import create_ascii_files
 def create_app():
     app = Flask(__name__, template_folder="templates")
 
-    def run_simulation(user_folder, time_out):  # TODO add time_out checking
+    def run_simulation(user_folder, time_out):
+        # Record the start time for timeout checking
+        start_time = time.time()
+
         # update status as processing
         status_file_path = os.path.join(user_folder, "status.txt")
         with open(status_file_path, "w") as status_file:
@@ -38,6 +42,11 @@ def create_app():
             # run model
             fs = FloodSimulator(**args)
             fs.run()
+
+            # Check if time has exceeded timeout
+            if time.time() - start_time > time_out:
+                error_info = f"Simulation timeout exceeded {time_out} sec."
+                raise Exception(error_info)
 
             # zip output files
             output_folder = os.path.join(user_folder, "output")
@@ -187,7 +196,7 @@ def create_app():
                     200,
                 )
             elif "failed" in status:
-                return jsonify({"error": f"Request {simulation_id} is {status}"}), 200
+                return jsonify({"error": f"Request {simulation_id} is {status}"}), 500
             elif status == "complete":
                 zip_output_path = os.path.join(user_folder, "output.zip")
                 if os.path.isfile(zip_output_path):

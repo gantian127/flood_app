@@ -5,6 +5,7 @@ Unit tests for flooding web app (async version)
 import pytest
 import json
 import uuid
+import time
 
 from flood_app import create_app, settings
 
@@ -18,15 +19,22 @@ def client():
         yield client
 
 
+@pytest.fixture()
+def headers():
+    """Create valid header info with API_KEY"""
+    return {"Authorization": f"Bearer {settings.API_KEY}"}
+
+
 @pytest.fixture(scope="module")
 def valid_uuid():
     """Create an uuid for valid request and check its status"""
     return str(uuid.uuid4())
 
-@pytest.fixture()
-def headers():
-    """Create valid header info with API_KEY"""
-    return {"Authorization": f"Bearer {settings.API_KEY}"}
+
+@pytest.fixture(scope="module")
+def timeout_uuid():
+    """Create an uuid for time out request and check its status"""
+    return str(uuid.uuid4())
 
 
 def test_app_creation(client):
@@ -49,7 +57,28 @@ def test_submit_simulation_forbidden(client):
     assert response.json["error"] == "Invalid API Key"
 
 
-def test_submit_simulation_valid_request_(client, valid_uuid, headers):
+def test_submit_simulation_time_out(client, timeout_uuid, headers):
+    """Test submitting a simulation with time out error."""
+    with open("./test_files/test_request_json_valid.json") as fp:
+        request_data = json.load(fp)
+    request_data["simulationId"] = timeout_uuid
+    request_data["timeout"] = 5  # adjust time out with shorter value for testing
+
+    response = client.post(
+        "/submit_simulation",
+        headers=headers,
+        data=json.dumps(request_data),
+        content_type="application/json",
+    )
+
+    assert response.status_code == 200
+    assert (
+        f"Request {request_data['simulationId']} is received."
+        in response.json["message"]
+    )
+
+
+def test_submit_simulation_valid_request(client, valid_uuid, headers):
     """Test submitting a valid request"""
     with open("./test_files/test_request_json_valid.json") as fp:
         request_data = json.load(fp)
@@ -89,7 +118,6 @@ def test_submit_simulation_invalid_id(client, headers):
 
 def test_submit_simulation_existing_id(client, valid_uuid, headers):
     """Test submitting a simulation with an existing UUID"""
-
     request_data = {
         "simulationId": valid_uuid,
         "map": "some map data",
@@ -160,6 +188,15 @@ def test_check_status_invalid_id(client):
 
     assert response.status_code == 400
     assert "Please provide a valid simulation ID." in response.json["error"]
+
+
+def test_check_status_timeout_id(client, timeout_uuid):
+    """Test checking the status of a timeout simulation id"""
+    time.sleep(50)
+    response = client.get(f"/check_status/{timeout_uuid}")
+
+    assert response.status_code == 500
+    assert f"Request {timeout_uuid} is failed. Error info: Simulation timeout exceeded" in response.json["error"]
 
 
 def test_check_status_valid_id(client, valid_uuid):

@@ -196,7 +196,10 @@ def test_check_status_timeout_id(client, timeout_uuid):
     response = client.get(f"/check_status/{timeout_uuid}")
 
     assert response.status_code == 500
-    assert f"Request {timeout_uuid} is failed. Error info: Simulation timeout exceeded" in response.json["error"]
+    assert (
+        f"Request {timeout_uuid} is failed. Error info: Simulation timeout exceeded"
+        in response.json["error"]
+    )
 
 
 def test_check_status_valid_id(client, valid_uuid):

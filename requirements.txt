@@ -9,4 +9,3 @@ landlab == 2.7
 rasterio
 tqdm
 toml
-uuid

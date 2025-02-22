@@ -6,7 +6,10 @@ A web application for overland flow simulation using `Landlab <https://github.co
 Installation
 +++++++++++++
 
-Use `conda` to install the necessary requirements and `flood_app`,
+Use `conda` to install the necessary requirements and `flood_app`.
+Please edit /flood_app/flood_app/settings.py file to define the API_KEY after
+downloading the code.
+
 
 .. code::
 
@@ -15,7 +18,6 @@ Use `conda` to install the necessary requirements and `flood_app`,
     $ conda install --file=requirements.txt -c conda-forge
     $ pip install .
 
-Start the server,
 
 .. code::
 
@@ -97,7 +99,6 @@ Endpoints
          -d @example_request.json
 
 - See example_request.json at /tests/test_files/test_request_json_valid.json
-- Need to create settings.py file to define API_KEY under /flood_app/flood_app/ folder.
 
 
 **2. Check Simulation Status**
@@ -116,7 +117,7 @@ Endpoints
 
 .. code::
 
-    # check status
+    # check status only
     curl "http://0.0.0.0/check_status/2f144dc1-25a6-484f-91d0-42ddb0ef75bb"
 
     # download file

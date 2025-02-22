@@ -11,7 +11,7 @@ plot_inf = true
 [model_run]
 model_run_time = 200
 storm_duration = 10
-time_step = 2
+time_step = 15
 activate_inf = false
 
 [infil_info]

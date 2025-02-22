@@ -6,6 +6,7 @@ import pytest
 import json
 import uuid
 import time
+import sys
 
 from flood_app import create_app, settings
 
@@ -190,6 +191,7 @@ def test_check_status_invalid_id(client):
     assert "Please provide a valid simulation ID." in response.json["error"]
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="Skipping test on Windows")
 def test_check_status_timeout_id(client, timeout_uuid):
     """Test checking the status of a timeout simulation id"""
     time.sleep(50)

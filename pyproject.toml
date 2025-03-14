@@ -59,11 +59,13 @@ dev = [
   "flake8-bugbear",
   "isort",
   "pre-commit",
+  "towncrier",
+  "zest.releaser[recommended]",
+]
+testing = [
   "pytest",
   "pytest-cov",
   "pytest-datadir",
-  "towncrier",
-  "zest.releaser[recommended]",
 ]
 
 [project.scripts]

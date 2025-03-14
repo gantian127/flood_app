@@ -61,6 +61,7 @@ dev = [
   "pre-commit",
   "pytest",
   "pytest-cov",
+  "pytest-datadir",
   "towncrier",
   "zest.releaser[recommended]",
 ]

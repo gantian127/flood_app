@@ -27,6 +27,5 @@ jobs:
           pip install -e ".[testing]"
 
       - name: Test
-        working-directory: ${{ github.workspace }}/tests
         run: |
           python -c 'import flood_app' && pytest

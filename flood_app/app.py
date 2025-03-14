@@ -14,7 +14,7 @@ import toml
 import uuid
 import threading
 
-from flask import Flask, request, jsonify, send_file, current_app
+from flask import Flask, render_template, request, jsonify, send_file, current_app
 from .model import FloodSimulator
 from .settings import API_KEY
 from .utils import create_ascii_files
@@ -22,6 +22,11 @@ from .utils import create_ascii_files
 
 def create_app():
     app = Flask(__name__, template_folder="templates")
+
+    # Display a simple index page to show the app is running.
+    @app.route("/")
+    def index():
+        return render_template("simple_index.html")
 
     def run_simulation(user_folder, time_out):
         # Record the start time for timeout checking

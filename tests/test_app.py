@@ -43,6 +43,12 @@ def test_app_creation(client):
     assert client is not None
 
 
+def test_index_route(client):
+    response = client.get("/")
+    assert response.status_code == 200
+    assert b"Flood app is running" in response.data
+
+
 def test_submit_simulation_unauthorized(client):
     """Test submitting a simulation no Authorization header is provided."""
     response = client.post("/submit_simulation", json={})

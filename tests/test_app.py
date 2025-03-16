@@ -64,9 +64,9 @@ def test_submit_simulation_forbidden(client):
     assert response.json["error"] == "Invalid API Key"
 
 
-def test_submit_simulation_time_out(client, timeout_uuid, headers):
+def test_submit_simulation_time_out(client, timeout_uuid, headers, shared_datadir):
     """Test submitting a simulation with time out error."""
-    with open("./test_files/test_request_json_valid.json") as fp:
+    with open(shared_datadir / "test_request_json_valid.json") as fp:
         request_data = json.load(fp)
     request_data["simulationId"] = timeout_uuid
     request_data["timeout"] = 5  # adjust time out with shorter value for testing
@@ -85,9 +85,9 @@ def test_submit_simulation_time_out(client, timeout_uuid, headers):
     )
 
 
-def test_submit_simulation_valid_request(client, valid_uuid, headers):
+def test_submit_simulation_valid_request(client, valid_uuid, headers, shared_datadir):
     """Test submitting a valid request"""
-    with open("./test_files/test_request_json_valid.json") as fp:
+    with open(shared_datadir / "test_request_json_valid.json") as fp:
         request_data = json.load(fp)
     request_data["simulationId"] = valid_uuid
 

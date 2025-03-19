@@ -2,9 +2,6 @@
 requires = ["cython", "numpy", "setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-include_package_data = true
-
 [project]
 name = "flood_app"
 description = "A RESTful interface to run Landlab overland flow component."
@@ -79,7 +76,7 @@ packages = ["flood_app"]
 
 # need to add this line to include templates files
 [tool.setuptools.package-data]
-"flood_app" = ["templates/*", "static/*"]
+"flood_app" = ["templates/*", "static/*", "config_file.toml"]
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.rst"]}

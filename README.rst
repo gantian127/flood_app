@@ -98,7 +98,8 @@ Endpoints
          -H "Content-Type: application/json" \
          -d @example_request.json
 
-- See example_request.json at ./tests/data/test_request_json_valid.json
+- An example JSON file for example_request.json can be found
+`here <tests/data/test_request_json_valid.json>`_.
 
 
 **2. Check Simulation Status**

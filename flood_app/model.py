@@ -20,6 +20,7 @@ $ python flood_simulator.py config_file.toml
 
 import sys
 import os
+import time
 
 try:
     import tomllib
@@ -182,9 +183,20 @@ class FloodSimulator:
                 ],
             )
 
+
+        # track time for simulation
+        start_time = time.time()
+
         # run model simulation
         for time_slice in trange(time_step, model_run_time + time_step, time_step):
+
             while elapsed_time < time_slice:
+                # Check if time has exceeded timeout
+                if time.time() - start_time > self.model_run["time_out"]:
+                    error_info = (f"Simulation timeout exceeded "
+                                  f"{self.model_run['time_out']} sec.")
+                    raise Exception(error_info)
+
                 # get adaptive time step
                 overland_flow.dt = min(overland_flow.calc_time_step(), time_step)
 

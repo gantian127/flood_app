@@ -8,7 +8,6 @@ app.run(debug=True, port=5001)
 """
 
 import os
-import time
 import shutil
 import toml
 import uuid
@@ -29,9 +28,6 @@ def create_app():
         return render_template("simple_index.html")
 
     def run_simulation(user_folder, time_out):
-        # Record the start time for timeout checking
-        start_time = time.time()
-
         # update status as processing
         status_file_path = os.path.join(user_folder, "status.txt")
         with open(status_file_path, "w") as status_file:
@@ -42,15 +38,12 @@ def create_app():
         with open(config_file_path, mode="r") as fp:
             args = toml.load(fp)
 
+        args["model_run"]["time_out"] = time_out
+
         try:
             # run model
             fs = FloodSimulator(**args)
             fs.run()
-
-            # Check if time has exceeded timeout
-            if time.time() - start_time > time_out:
-                error_info = f"Simulation timeout exceeded {time_out} sec."
-                raise Exception(error_info)
 
             # zip output files
             output_folder = os.path.join(user_folder, "output")

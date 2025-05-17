@@ -138,7 +138,7 @@ def create_app():
                 map_data,
                 user_folder,
                 json_str=True,
-                delineation=False,
+                delineation=True,
             )
         except Exception as e:
             return (

@@ -237,11 +237,11 @@ class FloodSimulator:
             data = []
             cell_size = self.model_grid.spacing[0]
             for i in np.arange(0, len(self.model_grid.at_node["surface_water__depth"])):
-                x, y = np.unravel_index(i, self.model_grid.shape)
+                y, x = np.unravel_index(i, self.model_grid.shape)
                 data.append(
                     {
-                        "x": x * cell_size,
-                        "y": y * cell_size,
+                        "x": x * cell_size,  # "x" in json is col of the model grid
+                        "y": y * cell_size,  # "y" in json is row of the model grid
                         "z": self.model_grid.at_node["surface_water__depth"][i],
                     }
                 )

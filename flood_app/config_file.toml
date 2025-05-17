@@ -13,6 +13,7 @@ model_run_time = 200
 storm_duration = 10
 time_step = 2
 activate_inf = false
+time_out = 300
 
 [infil_info]
 conductivity_file = ""

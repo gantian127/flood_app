@@ -39,8 +39,8 @@ def create_ascii_files(dem_info, output_folder, json_str=False, delineation=Fals
             data = json.load(file)[0]
 
     # get row, col and cell size info
-    nrows = data["verticalSquares"]   # vertical represents row numbers
-    ncols = data["horizontalSquares"]   # horizontal represents col numbers
+    nrows = data["verticalSquares"]  # vertical represents row numbers
+    ncols = data["horizontalSquares"]  # horizontal represents col numbers
     cellsize = round(111320 * data["squareSize"], 1)
     node_numbers = ncols * nrows
 

@@ -200,8 +200,12 @@ def test_check_status_invalid_id(client):
 @pytest.mark.skipif(sys.platform == "win32", reason="Skipping test on Windows")
 def test_check_status_timeout_id(client, timeout_uuid):
     """Test checking the status of a timeout simulation id"""
-    time.sleep(50)
+
     response = client.get(f"/check_status/{timeout_uuid}")
+
+    if response.status_code == 200:  # processing status
+        time.sleep(60)
+        response = client.get(f"/check_status/{timeout_uuid}")
 
     assert response.status_code == 500
     assert (

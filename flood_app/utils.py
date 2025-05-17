@@ -39,8 +39,8 @@ def create_ascii_files(dem_info, output_folder, json_str=False, delineation=Fals
             data = json.load(file)[0]
 
     # get row, col and cell size info
-    ncols = data["verticalSquares"]
-    nrows = data["horizontalSquares"]
+    nrows = data["verticalSquares"]   # vertical represents row numbers
+    ncols = data["horizontalSquares"]   # horizontal represents col numbers
     cellsize = round(111320 * data["squareSize"], 1)
     node_numbers = ncols * nrows
 
@@ -51,8 +51,8 @@ def create_ascii_files(dem_info, output_folder, json_str=False, delineation=Fals
 
     # get data from json string
     for i in np.arange(0, node_numbers):
-        x = entity[i]["metadata"]["colorResult"]["x"]
-        y = entity[i]["metadata"]["colorResult"]["y"]
+        y = entity[i]["metadata"]["colorResult"]["x"]  # in json x represents col ind
+        x = entity[i]["metadata"]["colorResult"]["y"]  # in json y represents row ind
         elevation[x][y] = entity[i]["elevation"]
         land_type[x][y] = entity[i]["metadata"]["colorResult"]["colorData"][0]["name"]
 

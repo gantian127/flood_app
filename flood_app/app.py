@@ -27,7 +27,7 @@ def create_app():
     def index():
         return render_template("simple_index.html")
 
-    def run_simulation(user_folder, time_out):
+    def run_simulation(user_folder):
         # update status as processing
         status_file_path = os.path.join(user_folder, "status.txt")
         with open(status_file_path, "w") as status_file:
@@ -37,8 +37,6 @@ def create_app():
         config_file_path = os.path.join(user_folder, "config_file.toml")
         with open(config_file_path, mode="r") as fp:
             args = toml.load(fp)
-
-        args["model_run"]["time_out"] = time_out
 
         try:
             # run model
@@ -82,7 +80,8 @@ def create_app():
             data = request.get_json()
             map_data = data.get("map")
             simulation_id = data.get("simulationId")
-            timeout = data.get("timeout")
+            timeout = data.get("timeout", 300)
+            model_param = data.get("modelParameters")
 
             # check map data
             if not map_data:
@@ -150,6 +149,16 @@ def create_app():
             args = toml.load(fp)
         args["terrain"]["grid_file"] = dem_ascii_path
         args["output"]["output_folder"] = output_folder
+        args["model_run"]["time_out"] = timeout
+
+        if model_param is not None:
+            args["model_run"]["model_run_time"] = model_param.get("modelRunTime", 200)
+            args["model_run"]["storm_duration"] = model_param.get("storm_duration", 10)
+            args["model_run"]["activate_inf"] = model_param.get("activate_inf", False)
+            args["olf_info"]["rain_intensity"] = model_param.get("rain_intensity", 59.2)
+            args["olf_info"]["steep_slope"] = model_param.get("steep_slope", True)
+            args["olf_info"]["mannings_n"] = model_param.get("mannings_n", 0.03)
+            args["olf_info"]["alpha"] = model_param.get("alpha", 0.7)
 
         config_file_path = os.path.join(user_folder, "config_file.toml")
         with open(config_file_path, "w") as config_file:
@@ -161,7 +170,7 @@ def create_app():
             status_file.write("wait in queue")
 
         # submit job
-        thread = threading.Thread(target=run_simulation, args=(user_folder, timeout))
+        thread = threading.Thread(target=run_simulation, args=(user_folder,))
         thread.start()
 
         return jsonify({"message": f"Request {simulation_id} is received."}), 200

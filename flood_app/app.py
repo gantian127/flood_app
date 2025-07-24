@@ -153,11 +153,11 @@ def create_app():
 
         if model_param is not None:
             args["model_run"]["model_run_time"] = model_param.get("modelRunTime", 200)
-            args["model_run"]["storm_duration"] = model_param.get("storm_duration", 10)
-            args["model_run"]["activate_inf"] = model_param.get("activate_inf", False)
-            args["olf_info"]["rain_intensity"] = model_param.get("rain_intensity", 59.2)
-            args["olf_info"]["steep_slope"] = model_param.get("steep_slope", True)
-            args["olf_info"]["mannings_n"] = model_param.get("mannings_n", 0.03)
+            args["model_run"]["storm_duration"] = model_param.get("stormDuration", 10)
+            args["model_run"]["activate_inf"] = model_param.get("activateInfiltration", False)
+            args["olf_info"]["rain_intensity"] = model_param.get("rainIntensity", 59.2)
+            args["olf_info"]["steep_slopes"] = model_param.get("steepSlopes", True)
+            args["olf_info"]["mannings_n"] = model_param.get("manningsN", 0.03)
             args["olf_info"]["alpha"] = model_param.get("alpha", 0.7)
 
         config_file_path = os.path.join(user_folder, "config_file.toml")

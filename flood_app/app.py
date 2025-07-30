@@ -7,60 +7,117 @@ app = create_app()
 app.run(debug=True, port=5001)
 """
 
-from flask import Flask, render_template, request, jsonify, send_file
-from .model import FloodSimulator
 import os
-
-try:
-    import tomllib
-except ModuleNotFoundError:
-    import tomli as tomllib
 import shutil
+import toml
+import uuid
+import threading
+
+from flask import Flask, render_template, request, jsonify, send_file, current_app
+from .model import FloodSimulator
+from .settings import API_KEY
+from .utils import create_ascii_files
 
 
 def create_app():
     app = Flask(__name__, template_folder="templates")
 
-    # Route to render the HTML form
+    # Display a simple index page to show the app is running.
     @app.route("/")
     def index():
-        return render_template("index.html")
+        return render_template("simple_index.html")
 
-    # Route to handle form submission
-    @app.route("/run_model", methods=["POST"])
-    def run_model():
-        # Get user input text
-        user_name = request.form["user_name"]
-        if user_name == "":
-            return jsonify({"error": "Please provide a valid user name."}), 400
+    def run_simulation(user_folder, time_out):
+        # update status as processing
+        status_file_path = os.path.join(user_folder, "status.txt")
+        with open(status_file_path, "w") as status_file:
+            status_file.write("processing")
 
+        # get model parameters
+        config_file_path = os.path.join(user_folder, "config_file.toml")
+        with open(config_file_path, mode="r") as fp:
+            args = toml.load(fp)
+
+        args["model_run"]["time_out"] = time_out
+
+        try:
+            # run model
+            fs = FloodSimulator(**args)
+            fs.run()
+
+            # zip output files
+            output_folder = os.path.join(user_folder, "output")
+            zip_file_path = os.path.join(user_folder, "output")
+            shutil.make_archive(zip_file_path, "zip", output_folder)
+
+            # update status as failed
+            status = "complete"
+
+        except Exception as e:
+            # update status as failed
+            status = f"failed. Error info: {e}"
+
+        finally:
+            # update the status file, whether success or failure
+            status_file_path = os.path.join(user_folder, "status.txt")
+            with open(status_file_path, "w") as status_file:
+                status_file.write(status)
+
+        return
+
+    # Route to handle submission
+    @app.route("/submit_simulation", methods=["POST"])
+    def submit_simulation():
+        # Check for Authorization header
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return jsonify({"error": "Unauthorized"}), 401
+
+        api_key = auth_header.split("Bearer ")[1]
+        if api_key != API_KEY:
+            return jsonify({"error": "Invalid API Key"}), 403
+
+        # parse JSON data
+        try:
+            data = request.get_json()
+            map_data = data.get("map")
+            simulation_id = data.get("simulationId")
+            timeout = data.get("timeout")
+
+            # check map data
+            if not map_data:
+                return jsonify({"error": "Missing valid map data."}), 400
+
+            # check simulation id
+            try:
+                uuid.UUID(simulation_id, version=4)
+            except ValueError:
+                return jsonify({"error": "Please provide a valid simulation ID."}), 400
+
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+        # prepare simulation folder
         # make upload folder
-        user_uploads = os.path.join(os.getcwd(), "user_uploads")
+        user_uploads = os.path.abspath(
+            os.path.join(current_app.root_path, "..", "user_upload")
+        )
         if not os.path.isdir(user_uploads):
             os.mkdir(user_uploads)
 
         # make user folder
-        user_folder = os.path.join(user_uploads, user_name)
-        if not os.path.isdir(user_folder):
-            os.mkdir(user_folder)
-
-        # Check dem file
-        if "dem_file" in request.files:
-            dem_file = request.files["dem_file"]
-            if dem_file.filename.endswith(".txt"):
-                dem_file_path = os.path.join(user_folder, dem_file.filename)
-                dem_file.save(dem_file_path)
-            else:
-                return jsonify({"error": "Please upload a valid dem file."}), 400
-
-        # check config file
-        if "config_file" in request.files:
-            config_file = request.files["config_file"]
-            if config_file.filename.endswith(".toml"):
-                config_file_path = os.path.join(user_folder, config_file.filename)
-                config_file.save(config_file_path)
-            else:
-                return (jsonify({"error": "Please provide a valid config file."}), 400)
+        user_folder = os.path.join(user_uploads, simulation_id)
+        if os.path.isdir(user_folder):
+            return (
+                jsonify(
+                    {
+                        "error": f"Request {simulation_id} is rejected. "
+                        f"Simulation ID already exists."
+                    }
+                ),
+                400,
+            )
+        os.mkdir(user_folder)
 
         # create output folder
         output_folder = os.path.join(user_folder, "output")
@@ -68,20 +125,90 @@ def create_app():
             shutil.rmtree(output_folder)
         os.mkdir(output_folder)
 
-        # get model parameters
-        with open(config_file_path, mode="rb") as fp:
-            args = tomllib.load(fp)
-        args["terrain"]["grid_file"] = dem_file_path
+        # create ascii files
+        try:
+            dem_ascii_path, mannings_ascii_path = create_ascii_files(
+                map_data,
+                user_folder,
+                json_str=True,
+                delineation=True,
+            )
+        except Exception as e:
+            return (
+                jsonify(
+                    {
+                        "error": f"Request {simulation_id} is rejected. "
+                        f"Invalid map json string: {e}"
+                    }
+                ),
+                400,
+            )
+
+        # create config file
+        config_template_path = os.path.join(current_app.root_path, "config_file.toml")
+        with open(config_template_path, mode="r") as fp:
+            args = toml.load(fp)
+        args["terrain"]["grid_file"] = dem_ascii_path
         args["output"]["output_folder"] = output_folder
 
-        # run model
-        fs = FloodSimulator(**args)
-        fs.run()
+        config_file_path = os.path.join(user_folder, "config_file.toml")
+        with open(config_file_path, "w") as config_file:
+            toml.dump(args, config_file)
 
-        # zip output files
-        zip_file_path = os.path.join(user_folder, f"{user_name}_output")
-        shutil.make_archive(zip_file_path, "zip", output_folder)
+        # create status file
+        status_file_path = os.path.join(user_folder, "status.txt")
+        with open(status_file_path, "w") as status_file:
+            status_file.write("wait in queue")
 
-        return send_file(f"{zip_file_path}.zip", as_attachment=True)
+        # submit job
+        thread = threading.Thread(target=run_simulation, args=(user_folder, timeout))
+        thread.start()
+
+        return jsonify({"message": f"Request {simulation_id} is received."}), 200
+
+    @app.route("/check_status/<simulation_id>", methods=["GET"])
+    def check_status(simulation_id):
+        """API to check the model run status"""
+
+        # check simulation id
+        try:
+            uuid.UUID(simulation_id, version=4)
+        except ValueError:
+            return jsonify({"error": "Please provide a valid simulation ID."}), 400
+
+        # check status of simulation
+        user_uploads = os.path.abspath(
+            os.path.join(current_app.root_path, "..", "user_upload")
+        )
+        user_folder = os.path.join(user_uploads, simulation_id)
+
+        if os.path.isdir(user_folder):
+            status_file_path = os.path.join(user_folder, "status.txt")
+            with open(status_file_path, "r") as f:
+                status = f.read()
+
+            if status in ["waiting in queue", "processing"]:
+                return (
+                    jsonify({"message": f"Request {simulation_id} is {status}."}),
+                    200,
+                )
+            elif "failed" in status:
+                return jsonify({"error": f"Request {simulation_id} is {status}"}), 500
+            elif status == "complete":
+                zip_output_path = os.path.join(user_folder, "output.zip")
+                if os.path.isfile(zip_output_path):
+                    download = request.args.get("download", "false").lower() == "true"
+                    if download:
+                        return send_file(f"{zip_output_path}", as_attachment=True)
+                    else:
+                        return (
+                            jsonify(
+                                {"message": f"Request {simulation_id} is complete."}
+                            ),
+                            200,
+                        )
+
+        else:
+            return jsonify({"error": "Simulation ID not found."}), 400
 
     return app

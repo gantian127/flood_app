@@ -20,6 +20,7 @@ $ python flood_simulator.py config_file.toml
 
 import sys
 import os
+import time
 
 try:
     import tomllib
@@ -28,8 +29,10 @@ except ModuleNotFoundError:
 import rasterio
 from tqdm import trange
 import pandas as pd
+import numpy as np
+import json
 
-from landlab.io import read_esri_ascii, write_esri_ascii
+from landlab.io import read_esri_ascii
 from landlab.components import OverlandFlow, SoilInfiltrationGreenAmpt
 
 
@@ -180,10 +183,21 @@ class FloodSimulator:
                 ],
             )
 
+        # track time for simulation
+        start_time = time.time()
+
         # run model simulation
         for time_slice in trange(time_step, model_run_time + time_step, time_step):
 
             while elapsed_time < time_slice:
+                # Check if time has exceeded timeout
+                if time.time() - start_time > self.model_run["time_out"]:
+                    error_info = (
+                        f"Simulation timeout exceeded "
+                        f"{self.model_run['time_out']} sec."
+                    )
+                    raise Exception(error_info)
+
                 # get adaptive time step
                 overland_flow.dt = min(overland_flow.calc_time_step(), time_step)
 
@@ -219,15 +233,34 @@ class FloodSimulator:
                 #     discharge
                 # )
 
-            # save surface water depth at each time step
-            write_esri_ascii(
-                os.path.join(
-                    output_folder, "surface_water_depth_{}.asc".format(time_slice)
-                ),
-                self.model_grid,
-                "surface_water__depth",
-                clobber=True,
+            # save surface water depth at each time step as ascii file
+            # write_esri_ascii(
+            #     os.path.join(
+            #         output_folder, "surface_water_depth_{}.asc".format(time_slice)
+            #     ),
+            #     self.model_grid,
+            #     "surface_water__depth",
+            #     clobber=True,
+            # )
+
+            # save surface water depth at each time step as json file
+            surf_water_file_path = os.path.join(
+                output_folder, f"surface_water_depth_{time_slice}.json"
             )
+            data = []
+            cell_size = self.model_grid.spacing[0]
+            for i in np.arange(0, len(self.model_grid.at_node["surface_water__depth"])):
+                y, x = np.unravel_index(i, self.model_grid.shape)
+                data.append(
+                    {
+                        "x": x * cell_size,  # "x" in json is col of the model grid
+                        "y": y * cell_size,  # "y" in json is row of the model grid
+                        "z": self.model_grid.at_node["surface_water__depth"][i],
+                    }
+                )
+
+            with open(surf_water_file_path, "w") as file:
+                json.dump(data, file, indent=4)
 
             # # save the max water depth at each time step
             # self.model_grid.at_node['max_surface_water__depth'] = np.maximum(

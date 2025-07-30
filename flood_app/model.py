@@ -262,6 +262,26 @@ class FloodSimulator:
             with open(surf_water_file_path, "w") as file:
                 json.dump(data, file, indent=4)
 
+            # save infiltration depth at each time step as json file
+            if self.model_run["activate_inf"]:
+                infiltration_file_path = os.path.join(
+                    output_folder, f"infiltration_{time_slice}.json"
+                )
+                infil_data = []
+                cell_size = self.model_grid.spacing[0]
+                for i in np.arange(0, len(self.model_grid.at_node["soil_water_infiltration__depth"])):
+                    y, x = np.unravel_index(i, self.model_grid.shape)
+                    infil_data.append(
+                        {
+                            "x": x * cell_size,  # "x" in json is col of the model grid
+                            "y": y * cell_size,  # "y" in json is row of the model grid
+                            "z": self.model_grid.at_node["soil_water_infiltration__depth"][i],
+                        }
+                    )
+
+                with open(infiltration_file_path, "w") as file:
+                    json.dump(infil_data, file, indent=4)
+
             # # save the max water depth at each time step
             # self.model_grid.at_node['max_surface_water__depth'] = np.maximum(
             #     self.model_grid.at_node['max_surface_water__depth'],

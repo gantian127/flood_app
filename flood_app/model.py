@@ -269,13 +269,17 @@ class FloodSimulator:
                 )
                 infil_data = []
                 cell_size = self.model_grid.spacing[0]
-                for i in np.arange(0, len(self.model_grid.at_node["soil_water_infiltration__depth"])):
+                for i in np.arange(
+                    0, len(self.model_grid.at_node["soil_water_infiltration__depth"])
+                ):
                     y, x = np.unravel_index(i, self.model_grid.shape)
                     infil_data.append(
                         {
                             "x": x * cell_size,  # "x" in json is col of the model grid
                             "y": y * cell_size,  # "y" in json is row of the model grid
-                            "z": self.model_grid.at_node["soil_water_infiltration__depth"][i],
+                            "z": self.model_grid.at_node[
+                                "soil_water_infiltration__depth"
+                            ][i],
                         }
                     )
 

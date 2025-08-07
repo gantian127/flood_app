@@ -16,7 +16,7 @@ import threading
 from flask import Flask, render_template, request, jsonify, send_file, current_app
 from .model import FloodSimulator
 from .settings import API_KEY
-from .utils import create_ascii_files
+from .utils import create_ascii_files_from_geojson
 
 
 def create_app():
@@ -126,10 +126,10 @@ def create_app():
 
         # create ascii files
         try:
-            dem_ascii_path, mannings_ascii_path = create_ascii_files(
+            dem_ascii_path = create_ascii_files_from_geojson(
                 map_data,
                 user_folder,
-                json_str=True,
+                geojson_str=True,
                 delineation=True,
             )
         except Exception as e:

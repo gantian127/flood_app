@@ -21,12 +21,76 @@ MANNING_MAPPING = {
 }
 
 
+def create_ascii_files_from_geojson(
+    dem_info, output_folder, geojson_str=False, delineation=False
+):
+    """
+    create ASCII files for elevation with a given dem geojson
+
+    :param dem_info: dem in UTM projection geojson file or json string
+    :param output_folder: where to store the output file
+    :param geojson_str: indicate whether the dem_info is as json str or a json file.
+           If false, open the file and load the file content.
+    :param delineation: indicate whether the input DEM needs watershed delineation.
+           If ture, input DEM will be processed for watershed delineation
+    :return: elevation.txt
+    """
+    if geojson_str:
+        data = dem_info
+    else:
+        with open(dem_info, "r") as file:
+            data = json.load(file)
+
+    # get row, col and cell size info
+    nrows = data["properties"]["verticalSquares"]  # vertical represents row numbers
+    ncols = data["properties"]["horizontalSquares"]  # horizontal represents col numbers
+    cellsize = data["properties"]["squareSize"]
+    node_numbers = ncols * nrows
+
+    # define empty arrays
+    features = data["features"]
+    elevation = np.empty([nrows, ncols])
+
+    # get data from geojson string
+    for i in np.arange(0, node_numbers):
+        y = features[i]["properties"]["x"]  # in json x represents col ind
+        x = features[i]["properties"]["y"]  # in json y represents row ind
+        elevation[x][y] = features[i]["properties"]["elevation"]
+
+    # define header info
+    header = {
+        "ncols": ncols,
+        "nrows": nrows,
+        "xllcorner": 0,
+        "yllcorner": 0,
+        "cellsize": cellsize,
+        "nodata_value": -9999,
+    }
+
+    header_lines = [f"{key} {str(val)}" for key, val in list(header.items())]
+
+    if delineation:
+        elevation = watershed_delineation(elevation, cellsize)
+
+    # save elevation data
+    elev_path = os.path.join(output_folder, "elevation.txt")
+    np.savetxt(
+        elev_path,
+        np.flipud(elevation),
+        header=os.linesep.join(header_lines),
+        comments="",
+    )
+
+    return elev_path
+
+
 def create_ascii_files(dem_info, output_folder, json_str=False, delineation=False):
     """
     create ASCII files for elevation and manning's n with a given dem json file
 
-    :param dem_info: dem json file or json string
+    :param dem_info: dem json file or json string create by fora.ai platform
     :param output_folder: where to store the output file
+    :param json_str: indicate whether the dem_info is as json str or a json file
     :param delineation: indicate whether the input DEM needs watershed delineation.
            If ture, input DEM will be processed for watershed delineation
     :return: the file path for elevation and manning's n file with file

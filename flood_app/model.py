@@ -248,13 +248,12 @@ class FloodSimulator:
                 output_folder, f"surface_water_depth_{time_slice}.json"
             )
             data = []
-            cell_size = self.model_grid.spacing[0]
             for i in np.arange(0, len(self.model_grid.at_node["surface_water__depth"])):
                 y, x = np.unravel_index(i, self.model_grid.shape)
                 data.append(
                     {
-                        "x": x * cell_size,  # "x" in json is col of the model grid
-                        "y": y * cell_size,  # "y" in json is row of the model grid
+                        "x": int(x) ,  # "x" in json is col of the model grid
+                        "y": int(y) ,  # "y" in json is row of the model grid
                         "z": self.model_grid.at_node["surface_water__depth"][i],
                     }
                 )
@@ -268,15 +267,14 @@ class FloodSimulator:
                     output_folder, f"infiltration_{time_slice}.json"
                 )
                 infil_data = []
-                cell_size = self.model_grid.spacing[0]
                 for i in np.arange(
                     0, len(self.model_grid.at_node["soil_water_infiltration__depth"])
                 ):
                     y, x = np.unravel_index(i, self.model_grid.shape)
                     infil_data.append(
                         {
-                            "x": x * cell_size,  # "x" in json is col of the model grid
-                            "y": y * cell_size,  # "y" in json is row of the model grid
+                            "x": int(x),  # "x" in json is col of the model grid
+                            "y": int(y),  # "y" in json is row of the model grid
                             "z": self.model_grid.at_node[
                                 "soil_water_infiltration__depth"
                             ][i],

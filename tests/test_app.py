@@ -219,9 +219,9 @@ def test_check_status_timeout_id(client, timeout_uuid):
     )
 
 
-def test_check_status_valid_id(client, valid_uuid):
+def test_check_status_valid_id(client, valid_uuids):
     """Test checking the status of a valid simulation id"""
-    response = client.get(f"/check_status/{valid_uuid}")
+    response = client.get(f"/check_status/{valid_uuids[0]}")
 
     assert response.status_code == 200
     assert (

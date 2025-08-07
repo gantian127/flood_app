@@ -34,12 +34,12 @@ classifiers = [
 ]
 requires-python = ">=3.11"
 dependencies = [
-    "numpy>=1.20,<2",
+    "numpy",
     "cherrypy",
     "click",
     "flask",
     "flask-cors",
-    "landlab==2.7",
+    "landlab>=2.9.0",
     "rasterio",
     "tqdm",
     "toml",

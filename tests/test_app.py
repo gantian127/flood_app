@@ -93,7 +93,9 @@ def test_submit_simulation_valid_requests(client, valid_uuids, headers, shared_d
             request_data = json.load(fp)
         request_data["simulationId"] = valid_uuids[i]
 
-        if i == 1:
+        if i == 0:
+            request_data["modelParameters"]["activateInfiltration"] = True
+        else:
             del request_data["modelParameters"]  # no model parameter settings
 
         response = client.post(

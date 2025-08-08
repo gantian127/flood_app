@@ -4,12 +4,11 @@
   "modelParameters": {
     "modelRunTime": 200,
     "stormDuration": 10,
-    "activateInfiltration": true,
+    "activateInfiltration": false,
     "rainIntensity": 59.2,
     "steepSlopes": true,
     "manningsN": 0.03,
-    "alpha": 0.7,
-    "elevationInFeet": "8322.2"
+    "alpha": 0.7
   },
   "map": {
     "type": "FeatureCollection",

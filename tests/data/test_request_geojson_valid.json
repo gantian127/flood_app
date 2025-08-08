@@ -9,8 +9,7 @@
     "steepSlopes": true,
     "manningsN": 0.03,
     "alpha": 0.7,
-    "elevationInFeet": "8322.2",
-    "id": "55317319-131d-4ade-ae9f-649f5f5bd20c"
+    "elevationInFeet": "8322.2"
   },
   "map": {
     "type": "FeatureCollection",

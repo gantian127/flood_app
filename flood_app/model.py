@@ -285,7 +285,9 @@ class FloodSimulator:
                     json.dump(infil_data, file, indent=4)
 
             # # !! testing: save discharge
-            # discharge_path = os.path.join(output_folder, f"discharge_{time_slice}.json")
+            # discharge_path = os.path.join(
+            # output_folder, f"discharge_{time_slice}.json"
+            # )
             # data = []
             # for i in np.arange(0, len(discharge)):
             #     y, x = np.unravel_index(i, self.model_grid.shape)

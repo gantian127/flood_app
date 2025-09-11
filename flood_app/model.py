@@ -284,6 +284,77 @@ class FloodSimulator:
                 with open(infiltration_file_path, "w") as file:
                     json.dump(infil_data, file, indent=4)
 
+            # # !! testing: save discharge
+            # discharge_path = os.path.join(
+            #     output_folder, f"discharge_{time_slice}.json"
+            # )
+            # data = []
+            # for i in np.arange(0, len(discharge)):
+            #     y, x = np.unravel_index(i, self.model_grid.shape)
+            #     data.append(
+            #         {
+            #             "x": int(x),  # "x" in json is col of the model grid
+            #             "y": int(y),  # "y" in json is row of the model grid
+            #             "z": discharge [i],
+            #         }
+            #     )
+            #
+            # with open(discharge_path, "w") as file:
+            #     json.dump(data, file, indent=4)
+            # # !! end of testing
+            #
+            # # !! testing: save landscape energy (velocity ^2) at each time step
+            # energy_path = os.path.join(
+            #     output_folder, f"energy_{time_slice}.json"
+            # )
+            #
+            # velocity_path = os.path.join(
+            #     output_folder, f"velocity_{time_slice}.json"
+            # )
+            #
+            # cross_area = self.model_grid.at_node["surface_water__depth"] * self.model_grid.dx
+            # print("cross area:", max(cross_area), min(cross_area))
+            # print("water depth:", max(self.model_grid.at_node["surface_water__depth"]), min(self.model_grid.at_node["surface_water__depth"]))
+            # print("discharge:", max(discharge), min(discharge))
+            # cross_area[cross_area<1e-6] = 0
+            #
+            # velocity = discharge / cross_area
+            # print("velocity:", max(velocity), min(velocity))
+            #
+            # energy = np.square(velocity)
+            # print("energy:", max(energy), min(energy))
+            #
+            # data = []
+            # for i in np.arange(0, len(energy)):
+            #     y, x = np.unravel_index(i, self.model_grid.shape)
+            #     data.append(
+            #         {
+            #             "x": int(x),  # "x" in json is col of the model grid
+            #             "y": int(y),  # "y" in json is row of the model grid
+            #             "z": velocity[i],
+            #         }
+            #     )
+            #
+            # with open(velocity_path, "w") as file:
+            #     json.dump(data, file, indent=4)
+            #
+            # data = []
+            # for i in np.arange(0, len(energy)):
+            #     y, x = np.unravel_index(i, self.model_grid.shape)
+            #     data.append(
+            #         {
+            #             "x": int(x),  # "x" in json is col of the model grid
+            #             "y": int(y),  # "y" in json is row of the model grid
+            #             "z": energy[i],
+            #         }
+            #     )
+            #
+            # with open(energy_path, "w") as file:
+            #     json.dump(data, file, indent=4)
+            #
+            # ## !! end of testing
+
+
             # # save the max water depth at each time step
             # self.model_grid.at_node['max_surface_water__depth'] = np.maximum(
             #     self.model_grid.at_node['max_surface_water__depth'],

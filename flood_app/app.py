@@ -15,6 +15,7 @@ import threading
 
 from flask import Flask, render_template, request, jsonify, send_file, current_app
 from .model import FloodSimulator
+from .evaluation import ModelEvaluation
 from .settings import API_KEY
 from .utils import create_ascii_files_from_geojson
 
@@ -45,8 +46,15 @@ def create_app():
 
             # zip output files
             output_folder = os.path.join(user_folder, "output")
-            zip_file_path = os.path.join(user_folder, "output")
-            shutil.make_archive(zip_file_path, "zip", output_folder)
+            model_eval = ModelEvaluation(
+                land_type_path=os.path.join(user_folder, "land_type.txt"),
+                max_water_depth_path=os.path.join(output_folder, "max_water_depth.asc"),
+                cum_result_path=os.path.join(output_folder, "cum_result_test.txt"),
+                infil_result_path=os.path.join(output_folder, "infil_result.txt"),
+                output_folder=output_folder,
+            )
+            model_eval.evaluate()
+            shutil.make_archive(output_folder, "zip", output_folder)
 
             # update status as failed
             status = "complete"
@@ -54,6 +62,7 @@ def create_app():
         except Exception as e:
             # update status as failed
             status = f"failed. Error info: {e}"
+            print(status)
 
         finally:
             # update the status file, whether success or failure
@@ -131,7 +140,7 @@ def create_app():
                 user_folder,
                 geojson_str=True,
                 delineation=True,
-            )
+            )  # TODO: update elevation.txt based on berm land type
         except Exception as e:
             return (
                 jsonify(
@@ -142,6 +151,15 @@ def create_app():
                 ),
                 400,
             )
+
+        # TODO: need to create manning's n and hydraulic conductivity file
+        #  when creating the elevation file
+        # create land type files
+        land_type_template_path = os.path.join(
+            current_app.root_path, "land_type_berm.txt"
+        )
+        land_type_file_path = os.path.join(user_folder, "land_type.txt")
+        shutil.copy(land_type_template_path, land_type_file_path)
 
         # create config file
         config_template_path = os.path.join(current_app.root_path, "config_file.toml")

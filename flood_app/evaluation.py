@@ -28,6 +28,7 @@ class ModelEvaluation:
         land_type_path,
         max_water_depth_path,
         cum_result_path,
+        infil_result_path,
         output_folder,
         cell_size=50,
     ):
@@ -38,7 +39,9 @@ class ModelEvaluation:
         with open(cum_result_path, "r") as f:
             first_line = f.readline().strip()
             self.cum_result = float(first_line.split(" ")[0])
-
+        with open(infil_result_path, "r") as f:
+            first_line = f.readline().strip()
+            self.infil_result = float(first_line.split(" ")[0])
         self.output_dir = output_folder
         self.cell_area = cell_size**2
         self.cell_size = cell_size
@@ -50,7 +53,7 @@ class ModelEvaluation:
         )
         investment = self.calc_investment()
 
-        # write results as a text file #TODO: update the write content
+        # write results as a text file
         eval_result_path = os.path.join(self.output_dir, "evaluation_results.txt")
         with open(eval_result_path, "w") as f:
             # f.write(f"{self.land_type}.\n")
@@ -62,6 +65,7 @@ class ModelEvaluation:
             f.write(f"maximum flooded area (m2): {max_flooded_area}\n")
             f.write(f"investment (dollars): {investment}\n")
             f.write(f"impact downstream (m3): {round(self.cum_result,3)}\n")
+            f.write(f"groundwater infiltration (m3): {round(self.infil_result,3)}\n")
 
         return eval_result_path
 

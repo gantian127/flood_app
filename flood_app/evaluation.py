@@ -21,7 +21,7 @@ import rasterio
 
 
 class ModelEvaluation:
-    LAND_TYPE = {"streets": 5, "houses": 6, "mulching": 7, "berm": 8}
+    LAND_TYPE = {"streets": 5, "houses": 6, "mulching": 7, "berm1": 8, "berm2": 9}
 
     def __init__(
         self,
@@ -126,18 +126,24 @@ class ModelEvaluation:
 
         # pre-defined criteria for berm
         berm_width = 2  # meter
-        berm_height = 1  # meter
+        berm_height_1 = 1  # meter
+        berm_height_2 = 2  # meter
         berm_build_cost = 30  # dollar/m3
         berm_maintain_cost = 3  # dollar/m3/year
 
         # pre-defined criteria for mulching
-        mulching_build_cost = 3  # dollar/m2
-        mulching_maintain_cost = 1  # dollar/m2/year
+        mulching_build_cost = 0.25  # dollar/m2
+        mulching_maintain_cost = mulching_build_cost * 0.05 # dollar/m2/year
 
-        # cost of berm
-        berm_cells = len(self.max_water_depth[self.land_type == self.LAND_TYPE["berm"]])
-        berm_volume = berm_width * berm_height * self.cell_size * berm_cells
-        berm_investment = berm_volume * (berm_build_cost + berm_maintain_cost * 20)
+        # cost of berm1
+        berm1_cells = len(self.max_water_depth[self.land_type == self.LAND_TYPE["berm1"]])
+        berm1_volume = berm_width * berm_height_1 * self.cell_size * berm1_cells
+        berm1_investment = berm1_volume * (berm_build_cost + berm_maintain_cost * 20)
+
+        # cost of berm2
+        berm2_cells = len(self.max_water_depth[self.land_type == self.LAND_TYPE["berm2"]])
+        berm2_volume = berm_width * berm_height_2 * self.cell_size * berm2_cells
+        berm2_investment = berm2_volume * (berm_build_cost + berm_maintain_cost * 20)
 
         # cost of mulching
         mulching_cells = len(
@@ -149,7 +155,7 @@ class ModelEvaluation:
             * (mulching_build_cost + mulching_maintain_cost * 20)
         )
 
-        investment = mulching_investment + berm_investment
+        investment = mulching_investment + berm1_investment + berm2_investment
 
         # !! Testing
         # print(berm_cells, mulching_cells)

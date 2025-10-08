@@ -188,7 +188,6 @@ class FloodSimulator:
 
         # run model simulation
         for time_slice in trange(time_step, model_run_time + time_step, time_step):
-
             while elapsed_time < time_slice:
                 # Check if time has exceeded timeout
                 if time.time() - start_time > self.model_run["time_out"]:
@@ -298,7 +297,8 @@ class FloodSimulator:
             #     json.dump(data, file, indent=4)
             # # !! end of testing
 
-            # # !! testing: save landscape velocity and energy (velocity ^2) at each time step
+            # # !! testing: save landscape velocity and energy (velocity ^2) at
+            # # each time step
             # energy_path = os.path.join(output_folder, f"energy_{time_slice}.json")
             #
             # velocity_path = os.path.join(output_folder, f"velocity_{time_slice}.json")

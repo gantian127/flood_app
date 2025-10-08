@@ -3,7 +3,8 @@ Evaluation (Tian Gan, 2025 Sept)
 
 Description:
 This code is for the participatory modeling project.
-It includes the ModelEvaluation class to evaluate the model performance with the model results
+It includes the ModelEvaluation class to evaluate the model performance
+with the model results
 
 """
 
@@ -11,12 +12,12 @@ import os
 import rasterio
 
 # folder = (
-#     "/Users/tiga7385/Desktop/flood_app/user_upload/
-#     9f144dc1-25a6-484f-91d0-42ddb0ef75b4"
+#   "/Users/tiga7385/Desktop/flood_app/user_upload/9f144dc1-25a6-484f-91d0-42ddb0ef75b9"
 # )
 # land_type_path = os.path.join(folder, "land_type.txt")
 # max_water_depth_path = os.path.join(folder, "output", "max_water_depth.asc")
 # cum_result_path = os.path.join(folder, "output", "cum_result_test.txt")
+# infil_result_path = os.path.join(folder, "output", "infil_result.txt")
 # output_folder = os.path.join(folder, "output")
 
 
@@ -48,9 +49,11 @@ class ModelEvaluation:
 
     def evaluate(self):
         # get evaluation results
-        max_flooded_area, flooded_streets_area, damage_cost = (
-            self.calc_flood_area_and_cost()
-        )
+        (
+            max_flooded_area,
+            flooded_streets_area,
+            damage_cost,
+        ) = self.calc_flood_area_and_cost()
         investment = self.calc_investment()
 
         # write results as a text file
@@ -133,15 +136,19 @@ class ModelEvaluation:
 
         # pre-defined criteria for mulching
         mulching_build_cost = 0.25  # dollar/m2
-        mulching_maintain_cost = mulching_build_cost * 0.05 # dollar/m2/year
+        mulching_maintain_cost = mulching_build_cost * 0.05  # dollar/m2/year
 
         # cost of berm1
-        berm1_cells = len(self.max_water_depth[self.land_type == self.LAND_TYPE["berm1"]])
+        berm1_cells = len(
+            self.max_water_depth[self.land_type == self.LAND_TYPE["berm1"]]
+        )
         berm1_volume = berm_width * berm_height_1 * self.cell_size * berm1_cells
         berm1_investment = berm1_volume * (berm_build_cost + berm_maintain_cost * 20)
 
         # cost of berm2
-        berm2_cells = len(self.max_water_depth[self.land_type == self.LAND_TYPE["berm2"]])
+        berm2_cells = len(
+            self.max_water_depth[self.land_type == self.LAND_TYPE["berm2"]]
+        )
         berm2_volume = berm_width * berm_height_2 * self.cell_size * berm2_cells
         berm2_investment = berm2_volume * (berm_build_cost + berm_maintain_cost * 20)
 
@@ -165,6 +172,10 @@ class ModelEvaluation:
 
 
 # test = ModelEvaluation(
-#     land_type_path, max_water_depth_path, cum_result_path, output_folder
+#     land_type_path,
+#     max_water_depth_path,
+#     cum_result_path,
+#     infil_result_path,
+#     output_folder,
 # )
 # test.evaluate()

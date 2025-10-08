@@ -441,7 +441,7 @@ class FloodSimulator:
 
         # save max surface water depth
         max_depth = self.model_grid.at_node["max_surface_water__depth"]
-        max_depth[self.model_grid.at_node["topographic__elevation"]==-9999.0] = 0
+        max_depth[self.model_grid.at_node["topographic__elevation"] == -9999.0] = 0
         write_esri_ascii(
             os.path.join(output_folder, "max_water_depth.asc"),
             self.model_grid,
@@ -452,7 +452,9 @@ class FloodSimulator:
         # save total infiltration volume results
         if self.model_run["activate_inf"]:
             infil_depth = self.model_grid.at_node["soil_water_infiltration__depth"]
-            infil_depth[self.model_grid.at_node["topographic__elevation"]==-9999.0] = 0
+            infil_depth[
+                self.model_grid.at_node["topographic__elevation"] == -9999.0
+            ] = 0
             # !! testing
             # write_esri_ascii(
             #     os.path.join(output_folder, "infil_result_depth.asc"),
@@ -467,19 +469,18 @@ class FloodSimulator:
             total_infil_volume = 0
 
         with open(
-                os.path.join(
-                    (
-                            self.output["output_folder"]
-                            if os.path.isdir(self.output["output_folder"])
-                            else os.getcwd()
-                    ),
-                    "infil_result.txt",
+            os.path.join(
+                (
+                    self.output["output_folder"]
+                    if os.path.isdir(self.output["output_folder"])
+                    else os.getcwd()
                 ),
-                "w",
+                "infil_result.txt",
+            ),
+            "w",
         ) as file:
             # Write the value to the file
             file.write(f"{total_infil_volume} cubic meters")
-
 
         # # as csv
         # df = pd.DataFrame(max_depth, columns=['z_value'])

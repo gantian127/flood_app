@@ -54,7 +54,13 @@ class ModelEvaluation:
             flooded_streets_area,
             damage_cost,
         ) = self.calc_flood_area_and_cost()
-        investment = self.calc_investment()
+
+        (
+            investment,
+            mulching_investment,
+            berm1_investment,
+            berm2_investment,
+        ) = self.calc_investment()  # TODO: only keep investment in the future
 
         # write results as a text file
         eval_result_path = os.path.join(self.output_dir, "evaluation_results.txt")
@@ -69,6 +75,9 @@ class ModelEvaluation:
             f.write(f"investment (dollars): {investment}\n")
             f.write(f"impact downstream (m3): {round(self.cum_result,3)}\n")
             f.write(f"groundwater infiltration (m3): {round(self.infil_result,3)}\n")
+            f.write(f"cost of mulching (dollars):{mulching_investment}\n")
+            f.write(f"cost of 1m berm (dollars): {berm1_investment}\n")
+            f.write(f"cost of 2m berm (dollars): {berm2_investment}\n")
 
         return eval_result_path
 
@@ -168,7 +177,8 @@ class ModelEvaluation:
         # print(berm_cells, mulching_cells)
         # print(berm_investment, mulching_investment)
 
-        return investment
+        # TODO, only keep investment when efficiency function is implemented
+        return investment, mulching_investment, berm1_investment, berm2_investment
 
 
 # test = ModelEvaluation(

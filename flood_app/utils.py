@@ -1,5 +1,12 @@
 """
 This is the utility file that includes functions used by the flood app
+
+Source of mapping table values
+mannings'n:
+- USGS https://pubs.usgs.gov/wsp/2339/report.pdf
+
+hydraulic conductivity:
+- GREEN-AMPT INFILTRATION PARAMETERS. FROM SOILS DATA. By Walter J. Rawls et al. 1982
 """
 
 import os
@@ -12,17 +19,38 @@ from landlab.utils import get_watershed_mask
 
 
 MANNING_MAPPING = {
-    "building": 0.1,
-    "imperviouscover": 0.2,
-    "otherwater": 0.3,
-    "permeable": 0.4,
-    "road": 0.5,
-    "unclassified": 0.6,
+    "unclassified": 0.03,
+    "barrenland": 0.025,
+    "openwater": 0.02,
+    "vegetatedland": 0.05,
+    "agricultural": 0.04,
+    "road": 0.0175,  # from L-Grid model
+    "building": 0.08,
+}
+
+CONDUCTIVITY_MAPPING = {
+    "unclassified": 1e-7,  # default
+    "barrenland": 5e-6,  # 5e-6
+    "openwater": 1e-7,  # low
+    "vegetatedland": 1e-5,  # high  1e-5
+    "agricultural": 5e-6,  # 5e-6
+    "road": 1e-10,  # ignore
+    "building": 1e-10,  # ignore
+}
+
+LANDTYPE_MAPPING = {
+    "unclassified": 0,
+    "barrenland": 10,
+    "openwater": 11,
+    "vegetatedland": 12,
+    "agricultural": 20,
+    "road": 30,
+    "building": 31,
 }
 
 
 def create_ascii_files_from_geojson(
-    dem_info, output_folder, geojson_str=False, delineation=False
+    dem_info, output_folder, geojson_str=False, delineation=False, no_data=-9999.0
 ):
     """
     create ASCII files for elevation with a given dem geojson
@@ -50,12 +78,46 @@ def create_ascii_files_from_geojson(
     # define empty arrays
     features = data["features"]
     elevation = np.empty([nrows, ncols])
+    land_type = np.full([nrows, ncols], LANDTYPE_MAPPING["unclassified"])
+    mannings_n = np.full([nrows, ncols], MANNING_MAPPING["unclassified"])
+    conductivity = np.full([nrows, ncols], CONDUCTIVITY_MAPPING["unclassified"])
 
     # get data from geojson string
     for i in np.arange(0, node_numbers):
         y = features[i]["properties"]["x"]  # in json x represents col ind
         x = features[i]["properties"]["y"]  # in json y represents row ind
+
+        # add elevation data
         elevation[x][y] = features[i]["properties"]["elevation"]
+
+        # add land type data
+        land_type_name = features[i]["properties"]["selectedLandType"]["name"]
+        land_type[x][y] = LANDTYPE_MAPPING.get(
+            land_type_name, LANDTYPE_MAPPING["unclassified"]
+        )
+
+        # add manning's n data
+        mannings_n[x][y] = MANNING_MAPPING.get(
+            land_type_name, MANNING_MAPPING["unclassified"]
+        )
+
+        # add hydraulic conductivity data
+        conductivity[x][y] = CONDUCTIVITY_MAPPING.get(
+            land_type_name, CONDUCTIVITY_MAPPING["unclassified"]
+        )
+
+        # TODO: update all these data when intervention is added
+
+    # watershed delineation
+    outlet_id = -1
+    if delineation:
+        elevation, outlet_id = watershed_delineation(
+            elevation, cellsize, no_data=no_data
+        )
+    # mask nodata for land type, manning's n and conductivity data
+    # land_type[elevation == no_data] = no_data
+    # mannings_n[elevation == no_data] = no_data
+    # conductivity[elevation == no_data] = no_data
 
     # define header info
     header = {
@@ -64,13 +126,10 @@ def create_ascii_files_from_geojson(
         "xllcorner": 0,
         "yllcorner": 0,
         "cellsize": cellsize,
-        "nodata_value": -9999,
+        "nodata_value": no_data,
     }
 
     header_lines = [f"{key} {str(val)}" for key, val in list(header.items())]
-
-    if delineation:
-        elevation = watershed_delineation(elevation, cellsize)
 
     # save elevation data
     elev_path = os.path.join(output_folder, "elevation.txt")
@@ -81,7 +140,43 @@ def create_ascii_files_from_geojson(
         comments="",
     )
 
-    return elev_path
+    # save land type data
+    land_type_path = os.path.join(output_folder, "land_type.txt")
+    np.savetxt(
+        land_type_path,
+        np.flipud(land_type),
+        header=os.linesep.join(header_lines),
+        comments="",
+        fmt="%d",
+    )
+
+    # save manning's n data
+    mannings_n_path = os.path.join(output_folder, "mannings_n.txt")
+    np.savetxt(
+        mannings_n_path,
+        np.flipud(mannings_n),
+        header=os.linesep.join(header_lines),
+        comments="",
+        fmt="%.4f",
+    )
+
+    # save hydraulic conductivity data
+    conductivity_path = os.path.join(output_folder, "conductivity.txt")
+    np.savetxt(
+        conductivity_path,
+        np.flipud(conductivity),
+        header=os.linesep.join(header_lines),
+        comments="",
+        fmt="%.4e",
+    )
+
+    return {
+        "outlet_id": outlet_id,
+        "elevation": elev_path,
+        "land_type": land_type_path,
+        "mannings_n": mannings_n_path,
+        "conductivity": conductivity_path,
+    }
 
 
 def create_ascii_files(dem_info, output_folder, json_str=False, delineation=False):
@@ -162,7 +257,7 @@ def create_ascii_files(dem_info, output_folder, json_str=False, delineation=Fals
     return elev_path, mannings_n_path
 
 
-def watershed_delineation(elevation, cell_size, no_data=-9999):
+def watershed_delineation(elevation, cell_size, no_data=-9999.0):
     """
     Conduct watershed delineation with the given elevation data.
 
@@ -205,4 +300,4 @@ def watershed_delineation(elevation, cell_size, no_data=-9999):
     # assign nodata to cells outside the watershed
     model_grid.at_node["topographic__elevation"][~watershed_mask] = no_data
 
-    return dem_field.reshape(grid_shape)
+    return dem_field.reshape(grid_shape), outlet

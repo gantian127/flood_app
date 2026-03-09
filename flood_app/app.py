@@ -12,6 +12,7 @@ import shutil
 import toml
 import uuid
 import threading
+import traceback
 
 from flask import Flask, render_template, request, jsonify, send_file, current_app
 from .model import FloodSimulator
@@ -61,7 +62,8 @@ def create_app():
 
         except Exception as e:
             # update status as failed
-            status = f"failed. Error info: {e}"
+            tb = traceback.format_exc()
+            status = f"failed. Error info: {e}\n{tb}"
             print(status)
 
         finally:
@@ -135,7 +137,7 @@ def create_app():
 
         # create ascii files
         try:
-            dem_ascii_path = create_ascii_files_from_geojson(
+            ascii_files = create_ascii_files_from_geojson(
                 map_data,
                 user_folder,
                 geojson_str=True,
@@ -152,22 +154,24 @@ def create_app():
                 400,
             )
 
-        # TODO: need to create manning's n and hydraulic conductivity file
-        #  when creating the elevation file
-        # create land type files
-        land_type_template_path = os.path.join(
-            current_app.root_path, "land_type_berm.txt"
-        )
-        land_type_file_path = os.path.join(user_folder, "land_type.txt")
-        shutil.copy(land_type_template_path, land_type_file_path)
+        # # create land type files using a template
+        # land_type_template_path = os.path.join(
+        #     current_app.root_path, "land_type_berm.txt"
+        # )
+        # land_type_file_path = os.path.join(user_folder, "land_type.txt")
+        # shutil.copy(land_type_template_path, land_type_file_path)
 
         # create config file
         config_template_path = os.path.join(current_app.root_path, "config_file.toml")
         with open(config_template_path, mode="r") as fp:
             args = toml.load(fp)
-        args["terrain"]["grid_file"] = dem_ascii_path
+        args["terrain"]["grid_file"] = ascii_files["elevation"]
+        args["terrain"]["outlet_id"] = int(ascii_files["outlet_id"])
         args["output"]["output_folder"] = output_folder
         args["model_run"]["time_out"] = timeout
+
+        # args["infil_info"]["conductivity_file"] = ascii_files["conductivity"]
+        args["olf_info"]["mannings_file"] = ascii_files["mannings_n"]
 
         if model_param is not None:
             args["model_run"]["model_run_time"] = model_param.get("modelRunTime", 200)

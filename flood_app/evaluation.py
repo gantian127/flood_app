@@ -22,7 +22,14 @@ import rasterio
 
 
 class ModelEvaluation:
-    LAND_TYPE = {"streets": 5, "houses": 6, "mulching": 7, "berm1": 8, "berm2": 9}
+    LAND_TYPE = {
+        "streets": 30,
+        "houses": 31,
+        "agricultural": 20,
+        "mulching": 7,
+        "berm1": 8,
+        "berm2": 9,
+    }
 
     def __init__(
         self,
@@ -52,7 +59,8 @@ class ModelEvaluation:
         (
             max_flooded_area,
             flooded_streets_area,
-            damage_cost,
+            damage_cost_infrastructure,
+            damage_cost_agricultural,
         ) = self.calc_flood_area_and_cost()
 
         (
@@ -69,12 +77,15 @@ class ModelEvaluation:
             # f.write(f"{self.max_water_depth}\n")
             # f.write(f"{self.cum_result}\n")
             # f.write(f"{self.output_dir}\n")
-            f.write(f"damage cost (dollars): {damage_cost}\n")
-            f.write(f"flooded streets (m2): {round(flooded_streets_area,3)}\n")
+            f.write(
+                f"damage cost infrastructure (dollars): {damage_cost_infrastructure}\n"
+            )
+            f.write(f"damage cost agricultural (dollars): {damage_cost_agricultural}\n")
+            f.write(f"flooded streets (m2): {round(flooded_streets_area, 3)}\n")
             f.write(f"maximum flooded area (m2): {max_flooded_area}\n")
             f.write(f"investment (dollars): {investment}\n")
-            f.write(f"impact downstream (m3): {round(self.cum_result,3)}\n")
-            f.write(f"groundwater infiltration (m3): {round(self.infil_result,3)}\n")
+            f.write(f"impact downstream (%): {round(self.cum_result, 3)}\n")
+            f.write(f"groundwater infiltration (%): {round(self.infil_result, 3)}\n")
             f.write(f"cost of mulching (dollars):{mulching_investment}\n")
             f.write(f"cost of 1m berm (dollars): {berm1_investment}\n")
             f.write(f"cost of 2m berm (dollars): {berm2_investment}\n")
@@ -85,14 +96,20 @@ class ModelEvaluation:
         """
         function to estimate maximum flooded area, flooded streets, and damage cost
         """
-        # TODO may need to define flood threshold for different land types
-        #  may define land type dict, right now all values are hardcoded
+        # TODO may need to define land type dict for flooding threshold,
+        #  right now all values are hardcoded
 
         # pre-defined criteria
         street_cost = 100  # dollar/ m2
         house_cost = 200  # dollar/ m2
+        agricultural_cost = 0.3  # dollar/ m2
         street_percentage = 7 / self.cell_size
-        thresholds = {"streets": 0.15, "houses": 0.2, "other": 0.3}
+        thresholds = {
+            "streets": 0.15,
+            "houses": 0.2,
+            "agricultural": 0.15,
+            "other": 0.3,
+        }
 
         # identify flooded cells
         flooded_streets_cells = len(
@@ -107,10 +124,18 @@ class ModelEvaluation:
                 & (self.max_water_depth >= thresholds["houses"])
             ]
         )
+        flooded_agricultural_cells = len(
+            self.max_water_depth[
+                (self.land_type == self.LAND_TYPE["agricultural"])
+                & (self.max_water_depth >= thresholds["agricultural"])
+            ]
+        )
+
         flooded_other_cells = len(
             self.max_water_depth[
                 (self.land_type != self.LAND_TYPE["streets"])
                 & (self.land_type != self.LAND_TYPE["houses"])
+                & (self.land_type != self.LAND_TYPE["agricultural"])
                 & (self.max_water_depth >= thresholds["other"])
             ]
         )
@@ -120,18 +145,26 @@ class ModelEvaluation:
             flooded_streets_cells * self.cell_area * street_percentage
         )
         max_flooded_area = (
-            flooded_houses_cells + flooded_other_cells
+            flooded_agricultural_cells + flooded_houses_cells + flooded_other_cells
         ) * self.cell_area + flooded_streets_area
 
         # calculate damage cost of street and house
         damage_cost_streets = flooded_streets_area * street_cost
         damage_cost_houses = flooded_houses_cells * self.cell_area * house_cost
-        damage_cost = damage_cost_houses + damage_cost_streets
+        damage_cost_infrastructure = damage_cost_houses + damage_cost_streets
+        damage_cost_agricultural = (
+            flooded_agricultural_cells * self.cell_area * agricultural_cost
+        )
 
         # !! Testing
         # print(flooded_streets_cells,flooded_houses_cells, flooded_other_cells)
 
-        return max_flooded_area, flooded_streets_area, damage_cost
+        return (
+            max_flooded_area,
+            flooded_streets_area,
+            damage_cost_infrastructure,
+            damage_cost_agricultural,
+        )
 
     def calc_investment(self):
         """Estimate the cost of interventions: mulching, berm"""

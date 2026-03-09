@@ -33,6 +33,7 @@ import numpy as np
 import json
 
 from landlab.io import read_esri_ascii, write_esri_ascii
+from landlab.grid.mappers import map_mean_of_link_nodes_to_link
 from landlab.components import OverlandFlow, SoilInfiltrationGreenAmpt
 
 
@@ -51,6 +52,7 @@ class FloodSimulator:
 
         self.rain_intensity = None
         self.hydraulic_conductivity = None
+        self.mannings_n = None
 
         self.setup_grid()
 
@@ -103,18 +105,33 @@ class FloodSimulator:
         # add rain intensity TODO: allow 3D rain input
         if self.olf_info["rain_file"] != "":
             file = rasterio.open(self.olf_info["rain_file"])
-            data = file.read(1).flatten()
-            self.rain_intensity = data
+            data = np.flipud(file.read(1))
+            self.rain_intensity = data.flatten()
         else:
             self.rain_intensity = self.olf_info["rain_intensity"]
 
         # add hydraulic conductivity
         if self.infil_info["conductivity_file"] != "":
             file = rasterio.open(self.infil_info["conductivity_file"])
-            data = file.read(1).flatten()
-            self.hydraulic_conductivity = data
+            data = np.flipud(file.read(1))
+            self.model_grid.add_field(
+                "hydraulic_conductivity", data.flatten(), at="node"
+            )
+            self.hydraulic_conductivity = "hydraulic_conductivity"
         else:
             self.hydraulic_conductivity = self.infil_info["hydraulic_conductivity"]
+
+        # add mannings'n
+        if self.olf_info["mannings_file"] != "":
+            file = rasterio.open(self.olf_info["mannings_file"])
+            data = np.flipud(file.read(1))
+            mannings_n_at_link = map_mean_of_link_nodes_to_link(
+                self.model_grid, data.flatten()
+            )
+            self.model_grid.add_field("mannings_n", mannings_n_at_link, at="link")
+            self.mannings_n = "mannings_n"
+        else:
+            self.mannings_n = self.olf_info["mannings_n"]
 
     def run(self):
         """
@@ -142,7 +159,7 @@ class FloodSimulator:
             self.model_grid,
             steep_slopes=self.olf_info["steep_slopes"],
             alpha=self.olf_info["alpha"],
-            mannings_n=self.olf_info["mannings_n"],
+            mannings_n=self.mannings_n,
             g=self.olf_info["g"],
             theta=self.olf_info["theta"],
         )
@@ -161,7 +178,7 @@ class FloodSimulator:
             # create instance
             infiltration = SoilInfiltrationGreenAmpt(
                 self.model_grid,
-                hydraulic_conductivity=self.hydraulic_conductivity,
+                # hydraulic_conductivity=self.hydraulic_conductivity,
                 soil_bulk_density=self.infil_info["soil_bulk_density"],
                 initial_soil_moisture_content=self.infil_info[
                     "initial_soil_moisture_content"
@@ -182,6 +199,9 @@ class FloodSimulator:
                     "wetting_front_capillary_pressure_head"
                 ],
             )
+
+            # only this way can assign the array values of conductivity correctly
+            infiltration.hydraulic_conductivity = self.hydraulic_conductivity
 
         # track time for simulation
         start_time = time.time()
@@ -402,6 +422,16 @@ class FloodSimulator:
             list(zip(outlet_times, outlet_discharge)), columns=["time", "discharge"]
         )
 
+        # save max surface water depth
+        max_depth = self.model_grid.at_node["max_surface_water__depth"]
+        max_depth[self.model_grid.at_node["topographic__elevation"] == -9999.0] = 0
+        write_esri_ascii(
+            os.path.join(output_folder, "max_water_depth.asc"),
+            self.model_grid,
+            "max_surface_water__depth",
+            clobber=True,
+        )
+
         # calculate cumulative discharge at outlet
         outlet_result["time_diff"] = outlet_result["time"].diff()
         outlet_result.at[0, "time_diff"] = outlet_result["time"].iloc[0]
@@ -413,43 +443,16 @@ class FloodSimulator:
         ]
         cum_flow_vol = outlet_result["cum_discharge_vol"].iloc[-1]
 
-        # save outlet related results
-        outlet_result.to_csv(
-            os.path.join(
-                (
-                    self.output["output_folder"]
-                    if os.path.isdir(self.output["output_folder"])
-                    else os.getcwd()
-                ),
-                "outlet_discharge.csv",
-            )
+        # calculate total surface water volume at the end of simulation
+        surface_water_depth = self.model_grid.at_node["surface_water__depth"]
+        surface_water_depth[
+            self.model_grid.at_node["topographic__elevation"] == -9999.0
+        ] = 0
+        total_surface_water_vol = surface_water_depth.sum() * (
+            self.model_grid.dx * self.model_grid.dy
         )
 
-        with open(
-            os.path.join(
-                (
-                    self.output["output_folder"]
-                    if os.path.isdir(self.output["output_folder"])
-                    else os.getcwd()
-                ),
-                "cum_result_test.txt",
-            ),
-            "w",
-        ) as file:
-            # Write the value to the file
-            file.write(str(cum_flow_vol) + " cubic meters")
-
-        # save max surface water depth
-        max_depth = self.model_grid.at_node["max_surface_water__depth"]
-        max_depth[self.model_grid.at_node["topographic__elevation"] == -9999.0] = 0
-        write_esri_ascii(
-            os.path.join(output_folder, "max_water_depth.asc"),
-            self.model_grid,
-            "max_surface_water__depth",
-            clobber=True,
-        )
-
-        # save total infiltration volume results
+        # calculate total infiltration volume at the end of simulation
         if self.model_run["activate_inf"]:
             infil_depth = self.model_grid.at_node["soil_water_infiltration__depth"]
             infil_depth[
@@ -468,6 +471,40 @@ class FloodSimulator:
         else:
             total_infil_volume = 0
 
+        # calculate total water input
+        total_water_vol = total_infil_volume + total_surface_water_vol + cum_flow_vol
+
+        # save outlet time series results
+        outlet_result.to_csv(
+            os.path.join(
+                (
+                    self.output["output_folder"]
+                    if os.path.isdir(self.output["output_folder"])
+                    else os.getcwd()
+                ),
+                "outlet_discharge.csv",
+            )
+        )
+
+        # save cumulative discharge results
+        with open(
+            os.path.join(
+                (
+                    self.output["output_folder"]
+                    if os.path.isdir(self.output["output_folder"])
+                    else os.getcwd()
+                ),
+                "cum_result_test.txt",
+            ),
+            "w",
+        ) as file:
+            file.write(
+                f"{round(cum_flow_vol / total_water_vol * 100, 3)} "
+                f"% of total water volume\n"
+            )
+            file.write(f"{cum_flow_vol} m3 cumulative discharge volume at outlet\n")
+
+        # save total infiltration results
         with open(
             os.path.join(
                 (
@@ -479,8 +516,32 @@ class FloodSimulator:
             ),
             "w",
         ) as file:
-            # Write the value to the file
-            file.write(f"{total_infil_volume} cubic meters")
+            file.write(
+                f"{round(total_infil_volume / total_water_vol * 100, 3)} "
+                f"% of total water volume\n"
+            )
+            file.write(f"{total_infil_volume} m3 total infiltration volume\n")
+
+        # save total surface water volume result
+        with open(
+            os.path.join(
+                (
+                    self.output["output_folder"]
+                    if os.path.isdir(self.output["output_folder"])
+                    else os.getcwd()
+                ),
+                "total_surf_water_result.txt",
+            ),
+            "w",
+        ) as file:
+            file.write(
+                f"{round(total_surface_water_vol / total_water_vol * 100, 3)} "
+                f"% of total rainfall volume\n"
+            )
+            file.write(
+                f"{total_surface_water_vol} m3 "
+                f"total surface water volume at final step\n"
+            )
 
         # # as csv
         # df = pd.DataFrame(max_depth, columns=['z_value'])

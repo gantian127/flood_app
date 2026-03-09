@@ -17,7 +17,6 @@ from landlab import RasterModelGrid
 from landlab.components import FlowAccumulator, ChannelProfiler
 from landlab.utils import get_watershed_mask
 
-
 MANNING_MAPPING = {
     "unclassified": 0.03,
     "barrenland": 0.025,

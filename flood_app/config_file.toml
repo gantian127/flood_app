@@ -38,6 +38,7 @@ surface_water_file = ""
 surface_water_depth = 1e-12
 steep_slopes = true
 alpha = 0.7
+mannings_file = ""
 mannings_n = 0.03
 g = 9.80665
 theta = 0.8

@@ -56,8 +56,6 @@ class ModelEvaluation:
         self.cell_size = cell_size
         self.no_data = no_data
 
-        print(self.max_water_depth.max())
-
     def evaluate(self):
         # get evaluation results
         (
@@ -154,10 +152,20 @@ class ModelEvaluation:
             flooded_agricultural_cells + flooded_houses_cells + flooded_other_cells
         ) * self.cell_area + flooded_streets_area
 
-        total_streets_cells = len(self.land_type[self.land_type == self.LAND_TYPE["streets"]])
+        total_streets_cells = len(
+            self.land_type[self.land_type == self.LAND_TYPE["streets"]]
+        )
         total_watershed_cells = len(self.land_type[self.land_type != self.no_data])
-        flooded_streets_percentage = 100 * flooded_streets_cells / total_streets_cells if total_streets_cells > 0 else 0
-        max_flooded_area_percentage = 100 * max_flooded_area / (total_watershed_cells * self.cell_area) if total_watershed_cells > 0 else 0
+        flooded_streets_percentage = (
+            100 * flooded_streets_cells / total_streets_cells
+            if total_streets_cells > 0
+            else 0
+        )
+        max_flooded_area_percentage = (
+            100 * max_flooded_area / (total_watershed_cells * self.cell_area)
+            if total_watershed_cells > 0
+            else 0
+        )
 
         # Testing!
         # print("total_streets_cells", total_streets_cells)
@@ -166,8 +174,8 @@ class ModelEvaluation:
         # print("total_watershed_cells", total_watershed_cells)
         # print("max_flooded_area", max_flooded_area)
         # print("max_flooded_area_percentage", max_flooded_area_percentage)
-        # print("flooded_cells", flooded_streets_cells, flooded_houses_cells, flooded_agricultural_cells, flooded_other_cells)
-
+        # print("flooded_cells", flooded_streets_cells, flooded_houses_cells,
+        # flooded_agricultural_cells, flooded_other_cells)
 
         # calculate damage cost of street and house
         damage_cost_streets = flooded_streets_area * street_cost

@@ -264,11 +264,14 @@ class FloodSimulator:
             data = []
             for i in np.arange(0, len(self.model_grid.at_node["surface_water__depth"])):
                 y, x = np.unravel_index(i, self.model_grid.shape)
+                z = self.model_grid.at_node["surface_water__depth"][i] \
+                    if (self.model_grid.at_node["topographic__elevation"][i] !=
+                        self.terrain["nodata_value"]) else self.terrain["nodata_value"]
                 data.append(
                     {
                         "x": int(x),  # "x" in json is col of the model grid
                         "y": int(y),  # "y" in json is row of the model grid
-                        "z": self.model_grid.at_node["surface_water__depth"][i],
+                        "z": z,
                     }
                 )
 
@@ -285,13 +288,15 @@ class FloodSimulator:
                     0, len(self.model_grid.at_node["soil_water_infiltration__depth"])
                 ):
                     y, x = np.unravel_index(i, self.model_grid.shape)
+                    z = self.model_grid.at_node["soil_water_infiltration__depth"][i] \
+                        if (self.model_grid.at_node["topographic__elevation"][i] !=
+                            self.terrain["nodata_value"]) else self.terrain[
+                        "nodata_value"]
                     infil_data.append(
                         {
                             "x": int(x),  # "x" in json is col of the model grid
                             "y": int(y),  # "y" in json is row of the model grid
-                            "z": self.model_grid.at_node[
-                                "soil_water_infiltration__depth"
-                            ][i],
+                            "z": z,
                         }
                     )
 
@@ -424,13 +429,29 @@ class FloodSimulator:
 
         # save max surface water depth
         max_depth = self.model_grid.at_node["max_surface_water__depth"]
-        max_depth[self.model_grid.at_node["topographic__elevation"] == -9999.0] = 0
+        max_depth[self.model_grid.at_node["topographic__elevation"] == self.terrain["nodata_value"]] = self.terrain["nodata_value"]
         write_esri_ascii(
             os.path.join(output_folder, "max_water_depth.asc"),
             self.model_grid,
             "max_surface_water__depth",
             clobber=True,
         )
+        max_surf_water_file_path = os.path.join(
+            output_folder, f"max_surface_water_depth_final.json"
+        )
+        data = []
+        for i in np.arange(0, len(self.model_grid.at_node["max_surface_water__depth"])):
+            y, x = np.unravel_index(i, self.model_grid.shape)
+            data.append(
+                {
+                    "x": int(x),  # "x" in json is col of the model grid
+                    "y": int(y),  # "y" in json is row of the model grid
+                    "z": self.model_grid.at_node["max_surface_water__depth"][i],
+                }
+            )
+
+        with open(max_surf_water_file_path, "w") as file:
+            json.dump(data, file, indent=4)
 
         # calculate cumulative discharge at outlet
         outlet_result["time_diff"] = outlet_result["time"].diff()

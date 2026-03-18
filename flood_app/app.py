@@ -92,6 +92,7 @@ def create_app():
             map_data = data.get("map")
             simulation_id = data.get("simulationId")
             timeout = data.get("timeout", 300)
+            model_intervention = data.get("modelIntervention", True)
             model_param = data.get("modelParameters")
 
             # check map data
@@ -142,7 +143,8 @@ def create_app():
                 user_folder,
                 geojson_str=True,
                 delineation=True,
-            )  # TODO: update elevation.txt based on berm land type
+                intervention=model_intervention,
+            )
         except Exception as e:
             return (
                 jsonify(
@@ -170,7 +172,7 @@ def create_app():
         args["output"]["output_folder"] = output_folder
         args["model_run"]["time_out"] = timeout
 
-        # args["infil_info"]["conductivity_file"] = ascii_files["conductivity"]
+        args["infil_info"]["conductivity_file"] = ascii_files["conductivity"]
         args["olf_info"]["mannings_file"] = ascii_files["mannings_n"]
 
         if model_param is not None:

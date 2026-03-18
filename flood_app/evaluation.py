@@ -26,9 +26,9 @@ class ModelEvaluation:
         "streets": 30,
         "houses": 31,
         "agricultural": 20,
-        "mulching": 7,
-        "berm1": 8,
-        "berm2": 9,
+        "berm_low": 50,
+        "berm_high": 51,
+        "mulch": 60,
     }
 
     def __init__(
@@ -39,6 +39,7 @@ class ModelEvaluation:
         infil_result_path,
         output_folder,
         cell_size=50,
+        no_data=-9999,
     ):
         with rasterio.open(land_type_path) as src:
             self.land_type = src.read(1)
@@ -53,12 +54,15 @@ class ModelEvaluation:
         self.output_dir = output_folder
         self.cell_area = cell_size**2
         self.cell_size = cell_size
+        self.no_data = no_data
+
+        print(self.max_water_depth.max())
 
     def evaluate(self):
         # get evaluation results
         (
-            max_flooded_area,
-            flooded_streets_area,
+            max_flooded_area_percentage,
+            flooded_streets_percentage,
             damage_cost_infrastructure,
             damage_cost_agricultural,
         ) = self.calc_flood_area_and_cost()
@@ -81,8 +85,10 @@ class ModelEvaluation:
                 f"damage cost infrastructure (dollars): {damage_cost_infrastructure}\n"
             )
             f.write(f"damage cost agricultural (dollars): {damage_cost_agricultural}\n")
-            f.write(f"flooded streets (m2): {round(flooded_streets_area, 3)}\n")
-            f.write(f"maximum flooded area (m2): {max_flooded_area}\n")
+            f.write(f"flooded streets (%): {round(flooded_streets_percentage, 3)}\n")
+            f.write(
+                f"maximum flooded area (%): {round(max_flooded_area_percentage, 3)}\n"
+            )
             f.write(f"investment (dollars): {investment}\n")
             f.write(f"impact downstream (%): {round(self.cum_result, 3)}\n")
             f.write(f"groundwater infiltration (%): {round(self.infil_result, 3)}\n")
@@ -140,13 +146,28 @@ class ModelEvaluation:
             ]
         )
 
-        # identify flooded area
+        # identify flooded area and percentage
         flooded_streets_area = (
             flooded_streets_cells * self.cell_area * street_percentage
         )
         max_flooded_area = (
             flooded_agricultural_cells + flooded_houses_cells + flooded_other_cells
         ) * self.cell_area + flooded_streets_area
+
+        total_streets_cells = len(self.land_type[self.land_type == self.LAND_TYPE["streets"]])
+        total_watershed_cells = len(self.land_type[self.land_type != self.no_data])
+        flooded_streets_percentage = 100 * flooded_streets_cells / total_streets_cells if total_streets_cells > 0 else 0
+        max_flooded_area_percentage = 100 * max_flooded_area / (total_watershed_cells * self.cell_area) if total_watershed_cells > 0 else 0
+
+        # Testing!
+        # print("total_streets_cells", total_streets_cells)
+        # print("flooded_streets_cells", flooded_streets_cells)
+        # print("flooded_streets_percentage", flooded_streets_percentage)
+        # print("total_watershed_cells", total_watershed_cells)
+        # print("max_flooded_area", max_flooded_area)
+        # print("max_flooded_area_percentage", max_flooded_area_percentage)
+        # print("flooded_cells", flooded_streets_cells, flooded_houses_cells, flooded_agricultural_cells, flooded_other_cells)
+
 
         # calculate damage cost of street and house
         damage_cost_streets = flooded_streets_area * street_cost
@@ -160,8 +181,8 @@ class ModelEvaluation:
         # print(flooded_streets_cells,flooded_houses_cells, flooded_other_cells)
 
         return (
-            max_flooded_area,
-            flooded_streets_area,
+            max_flooded_area_percentage,
+            flooded_streets_percentage,
             damage_cost_infrastructure,
             damage_cost_agricultural,
         )
@@ -182,21 +203,21 @@ class ModelEvaluation:
 
         # cost of berm1
         berm1_cells = len(
-            self.max_water_depth[self.land_type == self.LAND_TYPE["berm1"]]
+            self.max_water_depth[self.land_type == self.LAND_TYPE["berm_low"]]
         )
         berm1_volume = berm_width * berm_height_1 * self.cell_size * berm1_cells
         berm1_investment = berm1_volume * (berm_build_cost + berm_maintain_cost * 20)
 
         # cost of berm2
         berm2_cells = len(
-            self.max_water_depth[self.land_type == self.LAND_TYPE["berm2"]]
+            self.max_water_depth[self.land_type == self.LAND_TYPE["berm_high"]]
         )
         berm2_volume = berm_width * berm_height_2 * self.cell_size * berm2_cells
         berm2_investment = berm2_volume * (berm_build_cost + berm_maintain_cost * 20)
 
         # cost of mulching
         mulching_cells = len(
-            self.max_water_depth[self.land_type == self.LAND_TYPE["mulching"]]
+            self.max_water_depth[self.land_type == self.LAND_TYPE["mulch"]]
         )
         mulching_investment = (
             mulching_cells

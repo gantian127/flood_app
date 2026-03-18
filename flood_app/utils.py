@@ -25,31 +25,46 @@ MANNING_MAPPING = {
     "agricultural": 0.04,
     "road": 0.0175,  # from L-Grid model
     "building": 0.08,
+    "berm_low": 0.03,
+    "berm_high": 0.03,
+    "mulch": 0.06,
+
 }
 
 CONDUCTIVITY_MAPPING = {
     "unclassified": 1e-7,  # default
-    "barrenland": 5e-6,  # 5e-6
-    "openwater": 1e-7,  # low
-    "vegetatedland": 1e-5,  # high  1e-5
-    "agricultural": 5e-6,  # 5e-6
+    "barrenland": 2e-7,  # 5e-6？
+    "openwater": 1e-10,  # low
+    "vegetatedland": 1e-6,  # high  1e-5？
+    "agricultural": 5e-7,  # 5e-6？
     "road": 1e-10,  # ignore
     "building": 1e-10,  # ignore
+    "berm_low": 1e-7,
+    "berm_high": 1e-7,
+    "mulch": 1e-4,
 }
 
 LANDTYPE_MAPPING = {
-    "unclassified": 0,
+    "unclassified": 1,
     "barrenland": 10,
     "openwater": 11,
     "vegetatedland": 12,
     "agricultural": 20,
     "road": 30,
     "building": 31,
+    "berm_low": 50,
+    "berm_high": 51,
+    "mulch":60,
 }
 
 
 def create_ascii_files_from_geojson(
-    dem_info, output_folder, geojson_str=False, delineation=False, no_data=-9999.0
+    dem_info,
+    output_folder,
+    geojson_str=False,
+    delineation=False,
+    intervention=False,
+    no_data=-9999.0
 ):
     """
     create ASCII files for elevation with a given dem geojson
@@ -60,6 +75,8 @@ def create_ascii_files_from_geojson(
            If false, open the file and load the file content.
     :param delineation: indicate whether the input DEM needs watershed delineation.
            If ture, input DEM will be processed for watershed delineation
+    :param intervention: indicate whether the input DEM needs watershed intervention
+    :param no_data: indicate the cell that is outside the watershed.
     :return: elevation.txt
     """
     if geojson_str:
@@ -105,7 +122,22 @@ def create_ascii_files_from_geojson(
             land_type_name, CONDUCTIVITY_MAPPING["unclassified"]
         )
 
-        # TODO: update all these data when intervention is added
+        if intervention and len(features[i]["properties"]["tokens"])>0:
+            intervention_type = features[i]["properties"]["tokens"][0].get("type", "")
+            if intervention_type == "berm_low":
+                land_type[x][y] = LANDTYPE_MAPPING["berm_low"]
+                mannings_n[x][y] = MANNING_MAPPING["berm_low"]
+                conductivity[x][y] = CONDUCTIVITY_MAPPING["berm_low"]
+                elevation[x][y] = elevation[x][y] + 1  # add 1 meter elevation for berm
+            elif intervention_type == "berm_high":
+                land_type[x][y] = LANDTYPE_MAPPING["berm_high"]
+                mannings_n[x][y] = MANNING_MAPPING["berm_high"]
+                conductivity[x][y] = CONDUCTIVITY_MAPPING["berm_high"]
+                elevation[x][y] = elevation[x][y] + 2  # add 2 meter elevation for berm
+            elif intervention_type == "mulch":
+                land_type[x][y] = LANDTYPE_MAPPING["mulch"]
+                mannings_n[x][y] = MANNING_MAPPING["mulch"]
+                conductivity[x][y] = CONDUCTIVITY_MAPPING["mulch"]
 
     # watershed delineation
     outlet_id = -1
@@ -114,9 +146,9 @@ def create_ascii_files_from_geojson(
             elevation, cellsize, no_data=no_data
         )
     # mask nodata for land type, manning's n and conductivity data
-    # land_type[elevation == no_data] = no_data
+    land_type[elevation == no_data] = no_data
     # mannings_n[elevation == no_data] = no_data
-    # conductivity[elevation == no_data] = no_data
+    # conductivity[elevation == no_data] = no_data  # need to be positive values as input file
 
     # define header info
     header = {

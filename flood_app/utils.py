@@ -17,6 +17,8 @@ from landlab import RasterModelGrid
 from landlab.components import FlowAccumulator, ChannelProfiler
 from landlab.utils import get_watershed_mask
 
+
+# utility functions for app.py file
 MANNING_MAPPING = {
     "unclassified": 0.03,
     "barrenland": 0.025,
@@ -332,3 +334,53 @@ def watershed_delineation(elevation, cell_size, no_data=-9999.0):
     model_grid.at_node["topographic__elevation"][~watershed_mask] = no_data
 
     return dem_field.reshape(grid_shape), outlet
+
+# utility functions for evaluation.py
+def calculate_npv(
+    installation_cost,
+    initial_maintain_cost,
+    inflation_rates,
+    discount_rate,
+
+):
+    """
+    Calculate net present value (NPV) for an intervention infrastructure.
+
+    It first calculates the adjusted maintenance cost for each year based on the
+    inflation rates, then discount the future cost to present value and sum up the NPV
+    for each year. Finally, add the installation cost to get the total cost.
+
+    :param installation_cost: installation of cost at the first year
+    :param initial_maintain_cost: maintenance cost at the first year
+    :param inflation_rates: list of inflation rate for each year (e.g.[0.05, 0.04]).
+           The length of this list should be equal to (total_years - 1)
+    :param discount_rate: rate that future money is discounted to present value
+
+    :return: dictionary with yearly costs, NPV for each year, total NPV and total
+             cost with installation cost
+    """
+
+    yearly_costs = [initial_maintain_cost]
+
+    # calculate yearly costs for each year based on the inflation rates
+    for inflation in inflation_rates:
+        prev_cost = yearly_costs[-1]
+        new_cost = prev_cost * (1 + inflation)
+        yearly_costs.append(round(new_cost, 4))
+
+    # calculate npv for each year and total npv
+    npv_each_year = [
+        round(cost / ((1 + discount_rate) ** year), 4)
+        for year, cost in enumerate(yearly_costs)
+    ]
+    npv_total = sum(npv_each_year)
+
+    # add installation cost to the total cost
+    total_cost = installation_cost + npv_total
+
+    return {
+        "yearly_costs": yearly_costs,
+        "npv_each_year": npv_each_year,
+        "npv_total": round(npv_total, 3),
+        "total_cost": round(total_cost, 3),
+    }

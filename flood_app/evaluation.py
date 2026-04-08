@@ -10,6 +10,7 @@ with the model results
 
 import os
 import rasterio
+from .utils import calculate_npv
 
 # folder = (
 #   "/Users/tiga7385/Desktop/flood_app/user_upload/9f144dc1-25a6-484f-91d0-42ddb0ef75b9"
@@ -202,38 +203,54 @@ class ModelEvaluation:
         berm_width = 2  # meter
         berm_height_1 = 1  # meter
         berm_height_2 = 2  # meter
-        berm_build_cost = 30  # dollar/m3
+        berm_install_cost = 30  # dollar/m3
         berm_maintain_cost = 3  # dollar/m3/year
 
         # pre-defined criteria for mulching
-        mulching_build_cost = 0.25  # dollar/m2
-        mulching_maintain_cost = mulching_build_cost * 0.05  # dollar/m2/year
+        mulching_install_cost = 0.5  # dollar/m2
+        mulching_maintain_cost = mulching_install_cost * 0.05 # dollar/m2/year
+
+        # pre-define inflation rate for 20 years
+        inflation_rates = [0.033, 0.025, 0.021] +  [0.02] * 16
+
+        # pre-defined discount rate
+        discount_rate = 0.07
 
         # cost of berm1
         berm1_cells = len(
             self.max_water_depth[self.land_type == self.LAND_TYPE["berm_low"]]
         )
         berm1_volume = berm_width * berm_height_1 * self.cell_size * berm1_cells
-        berm1_investment = berm1_volume * (berm_build_cost + berm_maintain_cost * 20)
+        berm1_npv = calculate_npv(
+            berm_install_cost, berm_maintain_cost, inflation_rates, discount_rate)
+        berm1_investment = berm1_volume * berm1_npv["total_cost"]
 
         # cost of berm2
         berm2_cells = len(
             self.max_water_depth[self.land_type == self.LAND_TYPE["berm_high"]]
         )
         berm2_volume = berm_width * berm_height_2 * self.cell_size * berm2_cells
-        berm2_investment = berm2_volume * (berm_build_cost + berm_maintain_cost * 20)
+        berm2_npv = calculate_npv(
+            berm_install_cost, berm_maintain_cost, inflation_rates, discount_rate)
+        berm2_investment = berm2_volume * berm2_npv["total_cost"]
 
         # cost of mulching
         mulching_cells = len(
             self.max_water_depth[self.land_type == self.LAND_TYPE["mulch"]]
         )
+        mulching_npv = calculate_npv(
+            mulching_install_cost,
+            mulching_maintain_cost,
+            inflation_rates,
+            discount_rate
+        )
         mulching_investment = (
             mulching_cells
             * self.cell_area
-            * (mulching_build_cost + mulching_maintain_cost * 20)
+            * mulching_npv["total_cost"]
         )
 
-        investment = mulching_investment + berm1_investment + berm2_investment
+        investment = berm1_investment + berm2_investment + mulching_investment
 
         # !! Testing
         # print(berm_cells, mulching_cells)

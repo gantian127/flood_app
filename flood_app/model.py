@@ -436,6 +436,24 @@ class FloodSimulator:
             list(zip(outlet_times, outlet_discharge)), columns=["time", "discharge"]
         )
 
+        # save watershed elevation
+        watershed_elevation_file_path = os.path.join(
+            output_folder, "watershed_elevation.json"
+        )
+        data = []
+        for i in np.arange(0, len(self.model_grid.at_node["topographic__elevation"])):
+            y, x = np.unravel_index(i, self.model_grid.shape)
+            data.append(
+                {
+                    "x": int(x),  # "x" in json is col of the model grid
+                    "y": int(y),  # "y" in json is row of the model grid
+                    "z": self.model_grid.at_node["topographic__elevation"][i],
+                }
+            )
+
+        with open(watershed_elevation_file_path, "w") as file:
+            json.dump(data, file, indent=4)
+
         # save max surface water depth
         max_depth = self.model_grid.at_node["max_surface_water__depth"]
         max_depth[

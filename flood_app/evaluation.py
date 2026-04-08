@@ -208,10 +208,10 @@ class ModelEvaluation:
 
         # pre-defined criteria for mulching
         mulching_install_cost = 0.5  # dollar/m2
-        mulching_maintain_cost = mulching_install_cost * 0.05 # dollar/m2/year
+        mulching_maintain_cost = mulching_install_cost * 0.05  # dollar/m2/year
 
         # pre-define inflation rate for 20 years
-        inflation_rates = [0.033, 0.025, 0.021] +  [0.02] * 16
+        inflation_rates = [0.033, 0.025, 0.021] + [0.02] * 16
 
         # pre-defined discount rate
         discount_rate = 0.07
@@ -222,7 +222,8 @@ class ModelEvaluation:
         )
         berm1_volume = berm_width * berm_height_1 * self.cell_size * berm1_cells
         berm1_npv = calculate_npv(
-            berm_install_cost, berm_maintain_cost, inflation_rates, discount_rate)
+            berm_install_cost, berm_maintain_cost, inflation_rates, discount_rate
+        )
         berm1_investment = berm1_volume * berm1_npv["total_cost"]
 
         # cost of berm2
@@ -231,7 +232,8 @@ class ModelEvaluation:
         )
         berm2_volume = berm_width * berm_height_2 * self.cell_size * berm2_cells
         berm2_npv = calculate_npv(
-            berm_install_cost, berm_maintain_cost, inflation_rates, discount_rate)
+            berm_install_cost, berm_maintain_cost, inflation_rates, discount_rate
+        )
         berm2_investment = berm2_volume * berm2_npv["total_cost"]
 
         # cost of mulching
@@ -242,12 +244,10 @@ class ModelEvaluation:
             mulching_install_cost,
             mulching_maintain_cost,
             inflation_rates,
-            discount_rate
+            discount_rate,
         )
         mulching_investment = (
-            mulching_cells
-            * self.cell_area
-            * mulching_npv["total_cost"]
+            mulching_cells * self.cell_area * mulching_npv["total_cost"]
         )
 
         investment = berm1_investment + berm2_investment + mulching_investment

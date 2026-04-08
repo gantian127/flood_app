@@ -17,7 +17,6 @@ from landlab import RasterModelGrid
 from landlab.components import FlowAccumulator, ChannelProfiler
 from landlab.utils import get_watershed_mask
 
-
 # utility functions for app.py file
 MANNING_MAPPING = {
     "unclassified": 0.03,
@@ -335,13 +334,13 @@ def watershed_delineation(elevation, cell_size, no_data=-9999.0):
 
     return dem_field.reshape(grid_shape), outlet
 
+
 # utility functions for evaluation.py
 def calculate_npv(
     installation_cost,
     initial_maintain_cost,
     inflation_rates,
     discount_rate,
-
 ):
     """
     Calculate net present value (NPV) for an intervention infrastructure.

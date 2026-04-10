@@ -12,6 +12,7 @@ import os
 import rasterio
 from .utils import calculate_npv
 
+# !! Testing
 # folder = (
 #   "/Users/tiga7385/Desktop/flood_app/user_upload/9f144dc1-25a6-484f-91d0-42ddb0ef75b9"
 # )
@@ -236,8 +237,10 @@ class ModelEvaluation:
         berm2_npv = calculate_npv(
             berm_install_cost, berm_maintain_cost, inflation_rates, discount_rate
         )
-        print(berm2_npv)
         berm2_investment = round(berm2_volume * berm2_npv["total_cost"], 2)
+
+        # !! Testing
+        # print(berm1_npv, berm2_npv)
 
         # cost of mulching
         mulching_cells = len(
@@ -261,13 +264,3 @@ class ModelEvaluation:
 
         # TODO, only keep investment when efficiency function is implemented
         return investment, mulching_investment, berm1_investment, berm2_investment
-
-
-# test = ModelEvaluation(
-#     land_type_path,
-#     max_water_depth_path,
-#     cum_result_path,
-#     infil_result_path,
-#     output_folder,
-# )
-# test.evaluate()

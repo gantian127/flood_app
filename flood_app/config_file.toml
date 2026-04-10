@@ -9,8 +9,8 @@ plot_olf = true
 plot_inf = true
 
 [model_run]
-model_run_time = 200
-storm_duration = 10
+model_run_time = 300 #200
+storm_duration = 30 #10
 time_step = 2
 activate_inf = true
 time_out = 300
@@ -33,7 +33,7 @@ wetting_front_capillary_pressure_head = false
 
 [olf_info]
 rain_file = ""
-rain_intensity = 59.2
+rain_intensity = 70 #59.2
 surface_water_file = ""
 surface_water_depth = 1e-12
 steep_slopes = true

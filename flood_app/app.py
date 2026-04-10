@@ -146,6 +146,7 @@ def create_app():
                 intervention=model_intervention,
             )
         except Exception as e:
+            shutil.rmtree(user_folder)
             return (
                 jsonify(
                     {
@@ -176,12 +177,12 @@ def create_app():
         args["olf_info"]["mannings_file"] = ascii_files["mannings_n"]
 
         if model_param is not None:
-            args["model_run"]["model_run_time"] = model_param.get("modelRunTime", 200)
-            args["model_run"]["storm_duration"] = model_param.get("stormDuration", 10)
+            args["model_run"]["model_run_time"] = model_param.get("modelRunTime", 300)
+            args["model_run"]["storm_duration"] = model_param.get("stormDuration", 30)
             args["model_run"]["activate_inf"] = model_param.get(
                 "activateInfiltration", True
             )
-            args["olf_info"]["rain_intensity"] = model_param.get("rainIntensity", 59.2)
+            args["olf_info"]["rain_intensity"] = model_param.get("rainIntensity", 70)
             args["olf_info"]["steep_slopes"] = model_param.get("steepSlopes", True)
             args["olf_info"]["mannings_n"] = model_param.get("manningsN", 0.03)
             args["olf_info"]["alpha"] = model_param.get("alpha", 0.7)

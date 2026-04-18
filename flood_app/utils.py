@@ -41,7 +41,7 @@ CONDUCTIVITY_MAPPING = {
     "building": 1e-10,  # ignore
     "berm_low": 1e-7,
     "berm_high": 1e-7,
-    "mulch": 1e-4,
+    "mulch": 1e-5,
 }
 
 LANDTYPE_MAPPING = {

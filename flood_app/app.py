@@ -29,48 +29,55 @@ def create_app():
     def index():
         return render_template("simple_index.html")
 
+    # set the number of concurrent simulations
+    simulation_semaphore = threading.Semaphore(1)
+
     def run_simulation(user_folder):
         # update status as processing
         status_file_path = os.path.join(user_folder, "status.txt")
-        with open(status_file_path, "w") as status_file:
-            status_file.write("processing")
 
-        # get model parameters
-        config_file_path = os.path.join(user_folder, "config_file.toml")
-        with open(config_file_path, mode="r") as fp:
-            args = toml.load(fp)
-
-        try:
-            # run model
-            fs = FloodSimulator(**args)
-            fs.run()
-
-            # zip output files
-            output_folder = os.path.join(user_folder, "output")
-            model_eval = ModelEvaluation(
-                land_type_path=os.path.join(user_folder, "land_type.txt"),
-                max_water_depth_path=os.path.join(output_folder, "max_water_depth.asc"),
-                cum_result_path=os.path.join(output_folder, "cum_result_test.txt"),
-                infil_result_path=os.path.join(output_folder, "infil_result.txt"),
-                output_folder=output_folder,
-            )
-            model_eval.evaluate()
-            shutil.make_archive(output_folder, "zip", output_folder)
-
-            # update status as failed
-            status = "complete"
-
-        except Exception as e:
-            # update status as failed
-            tb = traceback.format_exc()
-            status = f"failed. Error info: {e}\n{tb}"
-            print(status)
-
-        finally:
-            # update the status file, whether success or failure
-            status_file_path = os.path.join(user_folder, "status.txt")
+        with simulation_semaphore:
             with open(status_file_path, "w") as status_file:
-                status_file.write(status)
+                status_file.write("processing")
+
+            # get model parameters
+            config_file_path = os.path.join(user_folder, "config_file.toml")
+            with open(config_file_path, mode="r") as fp:
+                args = toml.load(fp)
+
+            try:
+                # run model
+                fs = FloodSimulator(**args)
+                fs.run()
+
+                # zip output files
+                output_folder = os.path.join(user_folder, "output")
+                model_eval = ModelEvaluation(
+                    land_type_path=os.path.join(user_folder, "land_type.txt"),
+                    max_water_depth_path=os.path.join(
+                        output_folder, "max_water_depth.asc"
+                    ),
+                    cum_result_path=os.path.join(output_folder, "cum_result_test.txt"),
+                    infil_result_path=os.path.join(output_folder, "infil_result.txt"),
+                    output_folder=output_folder,
+                )
+                model_eval.evaluate()
+                shutil.make_archive(output_folder, "zip", output_folder)
+
+                # update status as complete
+                status = "complete"
+
+            except Exception as e:
+                # update status as failed
+                tb = traceback.format_exc()
+                status = f"failed. Error info: {e}\n{tb}"
+                print(status)
+
+            finally:
+                # update the status file, whether success or failure
+                status_file_path = os.path.join(user_folder, "status.txt")
+                with open(status_file_path, "w") as status_file:
+                    status_file.write(status)
 
         return
 
@@ -194,7 +201,7 @@ def create_app():
         # create status file
         status_file_path = os.path.join(user_folder, "status.txt")
         with open(status_file_path, "w") as status_file:
-            status_file.write("wait in queue")
+            status_file.write("waiting in queue")
 
         # submit job
         thread = threading.Thread(target=run_simulation, args=(user_folder,))

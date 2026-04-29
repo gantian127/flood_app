@@ -4,7 +4,7 @@ cherrypy
 click
 flask
 flask-cors
-landlab >= 2.9
+landlab == 2.10.0
 rasterio
 tqdm
 toml

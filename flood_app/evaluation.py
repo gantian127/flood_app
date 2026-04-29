@@ -259,8 +259,10 @@ class ModelEvaluation:
         investment = berm1_investment + berm2_investment + mulching_investment
 
         # !! Testing
-        # print(f"number of cells: berm 2m: {berm2_cells}, berm 1m：{berm1_cells}, mulching: {mulching_cells}")
-        # print(f"cost: berm 2m: {berm2_investment}, berm 1m {berm1_investment}, mulching: {mulching_investment}")
+        # print(f"number of cells: berm 2m: {berm2_cells}, berm 1m：{berm1_cells},
+        #       mulching: {mulching_cells}")
+        # print(f"cost: berm 2m: {berm2_investment}, berm 1m {berm1_investment},
+        #       mulching: {mulching_investment}")
         # print(f"total investment: {investment}")
 
         # TODO, only keep investment when efficiency function is implemented

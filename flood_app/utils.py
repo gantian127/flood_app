@@ -145,8 +145,10 @@ def create_ascii_files_from_geojson(
         elevation, outlet_id = watershed_delineation(
             elevation, cellsize, no_data=no_data
         )
+
     # mask nodata for land type, manning's n and conductivity data
-    land_type[elevation == no_data] = no_data
+    # land_type[elevation == no_data] = no_data
+    # land type needs to count interventions outside of watershed
     # mannings_n[elevation == no_data] = no_data
     # conductivity[elevation == no_data] = no_data
     # conductivity need to be positive values as input for the infiltration model
@@ -306,9 +308,9 @@ def watershed_delineation(elevation, cell_size, no_data=-9999.0):
     dem_field = model_grid.add_field(
         "topographic__elevation", elevation.astype("float")
     )
-    model_grid.status_at_node[dem_field < 0] = (
-        model_grid.BC_NODE_IS_CLOSED
-    )  # water area
+    model_grid.status_at_node[
+        dem_field < 0
+    ] = model_grid.BC_NODE_IS_CLOSED  # water area
 
     # flow accumulation
     fa = FlowAccumulator(

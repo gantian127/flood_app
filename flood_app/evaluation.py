@@ -9,6 +9,7 @@ with the model results
 """
 
 import os
+import numpy as np
 import rasterio
 from .utils import calculate_npv
 
@@ -77,10 +78,6 @@ class ModelEvaluation:
         # write results as a text file
         eval_result_path = os.path.join(self.output_dir, "evaluation_results.txt")
         with open(eval_result_path, "w") as f:
-            # f.write(f"{self.land_type}.\n")
-            # f.write(f"{self.max_water_depth}\n")
-            # f.write(f"{self.cum_result}\n")
-            # f.write(f"{self.output_dir}\n")
             f.write(
                 f"damage cost infrastructure (dollars): {damage_cost_infrastructure}\n"
             )
@@ -103,7 +100,7 @@ class ModelEvaluation:
         function to estimate maximum flooded area, flooded streets, and damage cost
         """
         # TODO may need to define land type dict for flooding threshold,
-        #  right now all values are hardcoded
+        # right now all values are hardcoded
 
         # pre-defined criteria
         street_cost = 100  # dollar/ m2
@@ -118,33 +115,27 @@ class ModelEvaluation:
         }
 
         # identify flooded cells
-        flooded_streets_cells = len(
-            self.max_water_depth[
-                (self.land_type == self.LAND_TYPE["streets"])
-                & (self.max_water_depth >= thresholds["streets"])
-            ]
+        streets_mask = self.land_type == self.LAND_TYPE["streets"]
+        houses_mask = self.land_type == self.LAND_TYPE["houses"]
+        agricultural_mask = self.land_type == self.LAND_TYPE["agricultural"]
+        other_mask = ~(streets_mask | houses_mask | agricultural_mask)
+        watershed_mask = self.max_water_depth != self.no_data
+
+        flooded_streets_cells = np.sum(
+            streets_mask & (self.max_water_depth >= thresholds["streets"])
         )
-        flooded_houses_cells = len(
-            self.max_water_depth[
-                (self.land_type == self.LAND_TYPE["houses"])
-                & (self.max_water_depth >= thresholds["houses"])
-            ]
+        flooded_houses_cells = np.sum(
+            houses_mask & (self.max_water_depth >= thresholds["houses"])
         )
-        flooded_agricultural_cells = len(
-            self.max_water_depth[
-                (self.land_type == self.LAND_TYPE["agricultural"])
-                & (self.max_water_depth >= thresholds["agricultural"])
-            ]
+        flooded_agricultural_cells = np.sum(
+            agricultural_mask & (self.max_water_depth >= thresholds["agricultural"])
+        )
+        flooded_other_cells = np.sum(
+            other_mask & (self.max_water_depth >= thresholds["other"])
         )
 
-        flooded_other_cells = len(
-            self.max_water_depth[
-                (self.land_type != self.LAND_TYPE["streets"])
-                & (self.land_type != self.LAND_TYPE["houses"])
-                & (self.land_type != self.LAND_TYPE["agricultural"])
-                & (self.max_water_depth >= thresholds["other"])
-            ]
-        )
+        total_streets_cells = np.sum(streets_mask & watershed_mask)
+        total_watershed_cells = np.sum(watershed_mask)
 
         # identify flooded area and percentage
         flooded_streets_area = (
@@ -154,10 +145,6 @@ class ModelEvaluation:
             flooded_agricultural_cells + flooded_houses_cells + flooded_other_cells
         ) * self.cell_area + flooded_streets_area
 
-        total_streets_cells = len(
-            self.land_type[self.land_type == self.LAND_TYPE["streets"]]
-        )
-        total_watershed_cells = len(self.land_type[self.land_type != self.no_data])
         flooded_streets_percentage = (
             100 * flooded_streets_cells / total_streets_cells
             if total_streets_cells > 0
@@ -220,9 +207,7 @@ class ModelEvaluation:
         discount_rate = 0.07
 
         # cost of berm1
-        berm1_cells = len(
-            self.max_water_depth[self.land_type == self.LAND_TYPE["berm_low"]]
-        )
+        berm1_cells = np.sum(self.land_type == self.LAND_TYPE["berm_low"])
         berm1_volume = berm_width * berm_height_1 * self.cell_size * berm1_cells
         berm1_npv = calculate_npv(
             berm_install_cost, berm_maintain_cost, inflation_rates, discount_rate
@@ -230,9 +215,7 @@ class ModelEvaluation:
         berm1_investment = round(berm1_volume * berm1_npv["total_cost"], 2)
 
         # cost of berm2
-        berm2_cells = len(
-            self.max_water_depth[self.land_type == self.LAND_TYPE["berm_high"]]
-        )
+        berm2_cells = np.sum(self.land_type == self.LAND_TYPE["berm_high"])
         berm2_volume = berm_width * berm_height_2 * self.cell_size * berm2_cells
         berm2_npv = calculate_npv(
             berm_install_cost, berm_maintain_cost, inflation_rates, discount_rate
@@ -243,9 +226,7 @@ class ModelEvaluation:
         # print(berm1_npv, berm2_npv)
 
         # cost of mulching
-        mulching_cells = len(
-            self.max_water_depth[self.land_type == self.LAND_TYPE["mulch"]]
-        )
+        mulching_cells = np.sum(self.land_type == self.LAND_TYPE["mulch"])
         mulching_npv = calculate_npv(
             mulching_install_cost,
             mulching_maintain_cost,
@@ -259,10 +240,10 @@ class ModelEvaluation:
         investment = berm1_investment + berm2_investment + mulching_investment
 
         # !! Testing
-        # print(f"number of cells: berm 2m: {berm2_cells}, berm 1m：{berm1_cells},
-        #       mulching: {mulching_cells}")
-        # print(f"cost: berm 2m: {berm2_investment}, berm 1m {berm1_investment},
-        #       mulching: {mulching_investment}")
+        # print(f"number of cells: berm 2m: {berm2_cells}, berm 1m：{berm1_cells}, "
+        #       f"mulching: {mulching_cells}")
+        # print(f"cost: berm 2m: {berm2_investment}, berm 1m {berm1_investment}, "
+        #       f"mulching: {mulching_investment}")
         # print(f"total investment: {investment}")
 
         # TODO, only keep investment when efficiency function is implemented

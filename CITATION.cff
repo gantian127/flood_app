@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Flood App"
+abstract: >
+  Flood App is a RESTful web service that integrates with the
+  Fora.ai platform (https://fora.northeastern.edu/) to support
+  participatory watershed modeling. Built on Landlab (https://landlab.csdms.io/),
+  the service performs watershed-scale simulations of surface runoff and soil
+  infiltration based on user-defined landscape conditions and mitigation interventions.
+
+authors:
+  - family-names: Gan
+    given-names: Tian
+    email: gantian127@gmail.com
+    affiliation: "Community Surface Dynamics Modeling System (CSDMS)"
+version: "0.3.0"
+date-released: "2026-06-05"
+license: MIT
+repository-code: "https://github.com/gantian127/flood_app"
+url: "https://github.com/gantian127/flood_app"
+keywords:
+  - landlab
+  - overland flow
+  - soil infiltration
+  - flood simulation
+  - participatory modeling
+  - geoscience
+  - hydrology

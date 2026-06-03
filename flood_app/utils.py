@@ -308,9 +308,9 @@ def watershed_delineation(elevation, cell_size, no_data=-9999.0):
     dem_field = model_grid.add_field(
         "topographic__elevation", elevation.astype("float")
     )
-    model_grid.status_at_node[
-        dem_field < 0
-    ] = model_grid.BC_NODE_IS_CLOSED  # water area
+    model_grid.status_at_node[dem_field < 0] = (
+        model_grid.BC_NODE_IS_CLOSED
+    )  # water area
 
     # flow accumulation
     fa = FlowAccumulator(

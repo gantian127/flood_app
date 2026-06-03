@@ -212,8 +212,7 @@ class FloodSimulator:
                 # Check if time has exceeded timeout
                 if time.time() - start_time > self.model_run["time_out"]:
                     error_info = (
-                        f"Simulation timeout exceeded "
-                        f"{self.model_run['time_out']} sec."
+                        f"Simulation timeout exceeded {self.model_run['time_out']} sec."
                     )
                     raise Exception(error_info)
 

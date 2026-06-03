@@ -3,16 +3,20 @@
     :width: 400px
     :align: center
 
-.. image:: https://readthedocs.org/projects/flood-app/badge/?version=latest
-    :target: https://flood-app.readthedocs.io/en/latest/?badge=latest
-    :alt: Documentation Status
+.. image:: https://img.shields.io/badge/docs-GitHub%20Pages-blue
+    :target: https://gantian127.github.io/flood_app/
+    :alt: Documentation
+
+.. image:: https://img.shields.io/badge/License-MIT-blue.svg
+    :target: https://opensource.org/licenses/MIT
+
+.. .. image:: https://readthedocs.org/projects/flood-app/badge/?version=latest
+..    :target: https://flood-app.readthedocs.io/en/latest/?badge=latest
+..    :alt: Documentation Status
 
 .. .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.18475558.svg
 ..     :target: https://doi.org/10.5281/zenodo.18475558
 ..     :alt: DOI
-
-.. image:: https://img.shields.io/badge/License-MIT-blue.svg
-    :target: https://opensource.org/licenses/MIT
 
 Flood App is a RESTful web service that integrates with the
 `Fora.ai platform <https://fora.northeastern.edu/>`_ to support participatory

@@ -52,7 +52,7 @@ Start the server:
 Documentation
 -------------
 
-Please read the `Full documentation <https://flood-app.readthedocs.io>`_ on ReadTheDocs
+Please read the `Full documentation <https://gantian127.github.io/flood_app/>`_ on ReadTheDocs
 for detailed information about Flood App.
 
 
@@ -60,7 +60,7 @@ API Specification
 -----------------
 
 For the API specification including request/response formats and examples,
-see the `API Documentation <https://flood-app.readthedocs.io/en/latest/endpoints.html>`_.
+see the `API Documentation <https://gantian127.github.io/flood_app/endpoints.html>`_.
 
 Contributing
 ------------

@@ -9,14 +9,17 @@ app.run(debug=True, port=5001)
 
 import os
 import shutil
-import toml
-import uuid
 import threading
+import traceback
+import uuid
 
-from flask import Flask, render_template, request, jsonify, send_file, current_app
+import toml
+from flask import Flask, current_app, jsonify, render_template, request, send_file
+
+from .evaluation import ModelEvaluation
 from .model import FloodSimulator
 from .settings import API_KEY
-from .utils import create_ascii_files
+from .utils import create_ascii_files_from_geojson
 
 
 def create_app():
@@ -27,41 +30,55 @@ def create_app():
     def index():
         return render_template("simple_index.html")
 
-    def run_simulation(user_folder, time_out):
+    # set the number of concurrent simulations
+    simulation_semaphore = threading.Semaphore(1)
+
+    def run_simulation(user_folder):
         # update status as processing
         status_file_path = os.path.join(user_folder, "status.txt")
-        with open(status_file_path, "w") as status_file:
-            status_file.write("processing")
 
-        # get model parameters
-        config_file_path = os.path.join(user_folder, "config_file.toml")
-        with open(config_file_path, mode="r") as fp:
-            args = toml.load(fp)
-
-        args["model_run"]["time_out"] = time_out
-
-        try:
-            # run model
-            fs = FloodSimulator(**args)
-            fs.run()
-
-            # zip output files
-            output_folder = os.path.join(user_folder, "output")
-            zip_file_path = os.path.join(user_folder, "output")
-            shutil.make_archive(zip_file_path, "zip", output_folder)
-
-            # update status as failed
-            status = "complete"
-
-        except Exception as e:
-            # update status as failed
-            status = f"failed. Error info: {e}"
-
-        finally:
-            # update the status file, whether success or failure
-            status_file_path = os.path.join(user_folder, "status.txt")
+        with simulation_semaphore:
             with open(status_file_path, "w") as status_file:
-                status_file.write(status)
+                status_file.write("processing")
+
+            # get model parameters
+            config_file_path = os.path.join(user_folder, "config_file.toml")
+            with open(config_file_path, mode="r") as fp:
+                args = toml.load(fp)
+
+            try:
+                # run model
+                fs = FloodSimulator(**args)
+                fs.run()
+
+                # zip output files
+                output_folder = os.path.join(user_folder, "output")
+                model_eval = ModelEvaluation(
+                    land_type_path=os.path.join(user_folder, "land_type.txt"),
+                    max_water_depth_path=os.path.join(
+                        output_folder, "max_water_depth.asc"
+                    ),
+                    cum_result_path=os.path.join(output_folder, "cum_result_test.txt"),
+                    infil_result_path=os.path.join(output_folder, "infil_result.txt"),
+                    output_folder=output_folder,
+                )
+                model_eval.evaluate()
+                shutil.make_archive(output_folder, "zip", output_folder)
+
+                # update status as complete
+                status = "complete"
+
+            except Exception as e:
+                # update status as failed
+                tb = traceback.format_exc()
+                status = f"failed. Error info: {e}\n{tb}"
+                print(status)
+
+            finally:
+                # update the status file, whether success or failure
+                status_file_path = os.path.join(user_folder, "status.txt")
+                with open(status_file_path, "w") as status_file:
+                    status_file.write(status)
 
         return
 
@@ -82,7 +99,9 @@ def create_app():
             data = request.get_json()
             map_data = data.get("map")
             simulation_id = data.get("simulationId")
-            timeout = data.get("timeout")
+            timeout = data.get("timeout", 300)
+            model_intervention = data.get("modelIntervention", True)
+            model_param = data.get("modelParameters")
 
             # check map data
             if not map_data:
@@ -127,13 +146,15 @@ def create_app():
 
         # create ascii files
         try:
-            dem_ascii_path, mannings_ascii_path = create_ascii_files(
+            ascii_files = create_ascii_files_from_geojson(
                 map_data,
                 user_folder,
-                json_str=True,
+                geojson_str=True,
                 delineation=True,
+                intervention=model_intervention,
             )
         except Exception as e:
+            shutil.rmtree(user_folder)
             return (
                 jsonify(
                     {
@@ -144,12 +165,35 @@ def create_app():
                 400,
             )
 
+        # # create land type files using a template
+        # land_type_template_path = os.path.join(
+        #     current_app.root_path, "land_type_berm.txt"
+        # )
+        # land_type_file_path = os.path.join(user_folder, "land_type.txt")
+        # shutil.copy(land_type_template_path, land_type_file_path)
+
         # create config file
         config_template_path = os.path.join(current_app.root_path, "config_file.toml")
         with open(config_template_path, mode="r") as fp:
             args = toml.load(fp)
-        args["terrain"]["grid_file"] = dem_ascii_path
+        args["terrain"]["grid_file"] = ascii_files["elevation"]
+        args["terrain"]["outlet_id"] = int(ascii_files["outlet_id"])
         args["output"]["output_folder"] = output_folder
+        args["model_run"]["time_out"] = timeout
+
+        args["infil_info"]["conductivity_file"] = ascii_files["conductivity"]
+        args["olf_info"]["mannings_file"] = ascii_files["mannings_n"]
+
+        if model_param is not None:
+            args["model_run"]["model_run_time"] = model_param.get("modelRunTime", 300)
+            args["model_run"]["storm_duration"] = model_param.get("stormDuration", 30)
+            args["model_run"]["activate_inf"] = model_param.get(
+                "activateInfiltration", True
+            )
+            args["olf_info"]["rain_intensity"] = model_param.get("rainIntensity", 70)
+            args["olf_info"]["steep_slopes"] = model_param.get("steepSlopes", True)
+            args["olf_info"]["mannings_n"] = model_param.get("manningsN", 0.03)
+            args["olf_info"]["alpha"] = model_param.get("alpha", 0.7)
 
         config_file_path = os.path.join(user_folder, "config_file.toml")
         with open(config_file_path, "w") as config_file:
@@ -158,10 +202,10 @@ def create_app():
         # create status file
         status_file_path = os.path.join(user_folder, "status.txt")
         with open(status_file_path, "w") as status_file:
-            status_file.write("wait in queue")
+            status_file.write("waiting in queue")
 
         # submit job
-        thread = threading.Thread(target=run_simulation, args=(user_folder, timeout))
+        thread = threading.Thread(target=run_simulation, args=(user_folder,))
         thread.start()
 
         return jsonify({"message": f"Request {simulation_id} is received."}), 200

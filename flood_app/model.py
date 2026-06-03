@@ -18,22 +18,23 @@ $ python flood_simulator.py config_file.toml
 
 """
 
-import sys
 import os
+import sys
 import time
 
 try:
     import tomllib
 except ModuleNotFoundError:
     import tomli as tomllib
-import rasterio
-from tqdm import trange
-import pandas as pd
-import numpy as np
 import json
 
-from landlab.io import read_esri_ascii
+import numpy as np
+import pandas as pd
+import rasterio
 from landlab.components import OverlandFlow, SoilInfiltrationGreenAmpt
+from landlab.grid.mappers import map_mean_of_link_nodes_to_link
+from landlab.io import read_esri_ascii, write_esri_ascii
+from tqdm import trange
 
 
 class FloodSimulator:
@@ -51,6 +52,7 @@ class FloodSimulator:
 
         self.rain_intensity = None
         self.hydraulic_conductivity = None
+        self.mannings_n = None
 
         self.setup_grid()
 
@@ -98,23 +100,38 @@ class FloodSimulator:
         self.model_grid.add_zeros("max_surface_water__depth", at="node")
 
         # maximum discharge (this field is added for result analysis)
-        self.model_grid.add_zeros("test_max_discharge", at="node")
+        # self.model_grid.add_zeros("test_max_discharge", at="node")
 
         # add rain intensity TODO: allow 3D rain input
         if self.olf_info["rain_file"] != "":
             file = rasterio.open(self.olf_info["rain_file"])
-            data = file.read(1).flatten()
-            self.rain_intensity = data
+            data = np.flipud(file.read(1))
+            self.rain_intensity = data.flatten()
         else:
             self.rain_intensity = self.olf_info["rain_intensity"]
 
         # add hydraulic conductivity
         if self.infil_info["conductivity_file"] != "":
             file = rasterio.open(self.infil_info["conductivity_file"])
-            data = file.read(1).flatten()
-            self.hydraulic_conductivity = data
+            data = np.flipud(file.read(1))
+            self.model_grid.add_field(
+                "hydraulic_conductivity", data.flatten(), at="node"
+            )
+            self.hydraulic_conductivity = "hydraulic_conductivity"
         else:
             self.hydraulic_conductivity = self.infil_info["hydraulic_conductivity"]
+
+        # add mannings'n
+        if self.olf_info["mannings_file"] != "":
+            file = rasterio.open(self.olf_info["mannings_file"])
+            data = np.flipud(file.read(1))
+            mannings_n_at_link = map_mean_of_link_nodes_to_link(
+                self.model_grid, data.flatten()
+            )
+            self.model_grid.add_field("mannings_n", mannings_n_at_link, at="link")
+            self.mannings_n = "mannings_n"
+        else:
+            self.mannings_n = self.olf_info["mannings_n"]
 
     def run(self):
         """
@@ -142,7 +159,7 @@ class FloodSimulator:
             self.model_grid,
             steep_slopes=self.olf_info["steep_slopes"],
             alpha=self.olf_info["alpha"],
-            mannings_n=self.olf_info["mannings_n"],
+            mannings_n=self.mannings_n,
             g=self.olf_info["g"],
             theta=self.olf_info["theta"],
         )
@@ -161,7 +178,7 @@ class FloodSimulator:
             # create instance
             infiltration = SoilInfiltrationGreenAmpt(
                 self.model_grid,
-                hydraulic_conductivity=self.hydraulic_conductivity,
+                # hydraulic_conductivity=self.hydraulic_conductivity,
                 soil_bulk_density=self.infil_info["soil_bulk_density"],
                 initial_soil_moisture_content=self.infil_info[
                     "initial_soil_moisture_content"
@@ -183,18 +200,19 @@ class FloodSimulator:
                 ],
             )
 
+            # only this way can assign the array values of conductivity correctly
+            infiltration.hydraulic_conductivity = self.hydraulic_conductivity
+
         # track time for simulation
         start_time = time.time()
 
         # run model simulation
         for time_slice in trange(time_step, model_run_time + time_step, time_step):
-
             while elapsed_time < time_slice:
                 # Check if time has exceeded timeout
                 if time.time() - start_time > self.model_run["time_out"]:
                     error_info = (
-                        f"Simulation timeout exceeded "
-                        f"{self.model_run['time_out']} sec."
+                        f"Simulation timeout exceeded {self.model_run['time_out']} sec."
                     )
                     raise Exception(error_info)
 
@@ -227,45 +245,145 @@ class FloodSimulator:
                 outlet_discharge.append(discharge[self.outlet_id])
                 outlet_times.append(elapsed_time)
 
+                self.model_grid.at_node["max_surface_water__depth"] = np.maximum(
+                    self.model_grid.at_node["max_surface_water__depth"],
+                    self.model_grid.at_node["surface_water__depth"],
+                )
+
                 # # save the max discharge at each time step (result analysis)
                 # self.model_grid.at_node['test_max_discharge'] = np.maximum(
                 #     self.model_grid.at_node['test_max_discharge'],
                 #     discharge
                 # )
 
-            # save surface water depth at each time step as ascii file
-            # write_esri_ascii(
-            #     os.path.join(
-            #         output_folder, "surface_water_depth_{}.asc".format(time_slice)
-            #     ),
-            #     self.model_grid,
-            #     "surface_water__depth",
-            #     clobber=True,
-            # )
-
             # save surface water depth at each time step as json file
             surf_water_file_path = os.path.join(
                 output_folder, f"surface_water_depth_{time_slice}.json"
             )
             data = []
-            cell_size = self.model_grid.spacing[0]
             for i in np.arange(0, len(self.model_grid.at_node["surface_water__depth"])):
                 y, x = np.unravel_index(i, self.model_grid.shape)
+                z = (
+                    self.model_grid.at_node["surface_water__depth"][i]
+                    if (
+                        self.model_grid.at_node["topographic__elevation"][i]
+                        != self.terrain["nodata_value"]
+                    )
+                    else self.terrain["nodata_value"]
+                )
                 data.append(
                     {
-                        "x": x * cell_size,  # "x" in json is col of the model grid
-                        "y": y * cell_size,  # "y" in json is row of the model grid
-                        "z": self.model_grid.at_node["surface_water__depth"][i],
+                        "x": int(x),  # "x" in json is col of the model grid
+                        "y": int(y),  # "y" in json is row of the model grid
+                        "z": z,
                     }
                 )
 
             with open(surf_water_file_path, "w") as file:
                 json.dump(data, file, indent=4)
 
-            # # save the max water depth at each time step
-            # self.model_grid.at_node['max_surface_water__depth'] = np.maximum(
-            #     self.model_grid.at_node['max_surface_water__depth'],
-            #     self.model_grid.at_node['surface_water__depth'])
+            # save infiltration depth at each time step as json file
+            if self.model_run["activate_inf"]:
+                infiltration_file_path = os.path.join(
+                    output_folder, f"infiltration_{time_slice}.json"
+                )
+                infil_data = []
+                for i in np.arange(
+                    0, len(self.model_grid.at_node["soil_water_infiltration__depth"])
+                ):
+                    y, x = np.unravel_index(i, self.model_grid.shape)
+                    z = (
+                        self.model_grid.at_node["soil_water_infiltration__depth"][i]
+                        if (
+                            self.model_grid.at_node["topographic__elevation"][i]
+                            != self.terrain["nodata_value"]
+                        )
+                        else self.terrain["nodata_value"]
+                    )
+                    infil_data.append(
+                        {
+                            "x": int(x),  # "x" in json is col of the model grid
+                            "y": int(y),  # "y" in json is row of the model grid
+                            "z": z,
+                        }
+                    )
+
+                with open(infiltration_file_path, "w") as file:
+                    json.dump(infil_data, file, indent=4)
+
+            # # !! testing: save discharge as json
+            # discharge_path = os.path.join(
+            # output_folder, f"discharge_{time_slice}.json"
+            # )
+            # data = []
+            # for i in np.arange(0, len(discharge)):
+            #     y, x = np.unravel_index(i, self.model_grid.shape)
+            #     data.append(
+            #         {
+            #             "x": int(x),  # "x" in json is col of the model grid
+            #             "y": int(y),  # "y" in json is row of the model grid
+            #             "z": discharge[i],
+            #         }
+            #     )
+            #
+            # with open(discharge_path, "w") as file:
+            #     json.dump(data, file, indent=4)
+            # # !! end of testing
+
+            # # !! testing: save landscape velocity and energy (velocity ^2) at
+            # # each time step
+            # energy_path = os.path.join(output_folder, f"energy_{time_slice}.json")
+            #
+            # velocity_path = os.path.join(output_folder, f"velocity_{time_slice}.json")
+            #
+            # cross_area = (
+            #     self.model_grid.at_node["surface_water__depth"] * self.model_grid.dx
+            # )
+            # print("cross area:", max(cross_area), min(cross_area))
+            # print(
+            #     "water depth:",
+            #     max(self.model_grid.at_node["surface_water__depth"]),
+            #     min(self.model_grid.at_node["surface_water__depth"]),
+            # )
+            # print("discharge:", max(discharge), min(discharge))
+            # cross_area[cross_area < 1e-6] = 0
+            #
+            # velocity = discharge / cross_area
+            # print(velocity[cross_area<1e-6][:5])
+            # velocity[cross_area<1e-6] = 0
+            # print("velocity:", max(velocity), min(velocity))
+            #
+            # energy = np.square(velocity)
+            # print("energy:", max(energy), min(energy))
+            #
+            # data = []
+            # for i in np.arange(0, len(energy)):
+            #     y, x = np.unravel_index(i, self.model_grid.shape)
+            #     data.append(
+            #         {
+            #             "x": int(x),  # "x" in json is col of the model grid
+            #             "y": int(y),  # "y" in json is row of the model grid
+            #             "z": velocity[i],
+            #         }
+            #     )
+            #
+            # with open(velocity_path, "w") as file:
+            #     json.dump(data, file, indent=4)
+            #
+            # data = []
+            # for i in np.arange(0, len(energy)):
+            #     y, x = np.unravel_index(i, self.model_grid.shape)
+            #     data.append(
+            #         {
+            #             "x": int(x),  # "x" in json is col of the model grid
+            #             "y": int(y),  # "y" in json is row of the model grid
+            #             "z": energy[i],
+            #         }
+            #     )
+            #
+            # with open(energy_path, "w") as file:
+            #     json.dump(data, file, indent=4)
+            # !! end of testing
 
             # # plot overland flow results
             # if self.output['plot_olf']:
@@ -317,6 +435,53 @@ class FloodSimulator:
             list(zip(outlet_times, outlet_discharge)), columns=["time", "discharge"]
         )
 
+        # save watershed elevation
+        watershed_elevation_file_path = os.path.join(
+            output_folder, "watershed_elevation.json"
+        )
+        data = []
+        for i in np.arange(0, len(self.model_grid.at_node["topographic__elevation"])):
+            y, x = np.unravel_index(i, self.model_grid.shape)
+            data.append(
+                {
+                    "x": int(x),  # "x" in json is col of the model grid
+                    "y": int(y),  # "y" in json is row of the model grid
+                    "z": self.model_grid.at_node["topographic__elevation"][i],
+                }
+            )
+
+        with open(watershed_elevation_file_path, "w") as file:
+            json.dump(data, file, indent=4)
+
+        # save max surface water depth
+        max_depth = self.model_grid.at_node["max_surface_water__depth"]
+        max_depth[
+            self.model_grid.at_node["topographic__elevation"]
+            == self.terrain["nodata_value"]
+        ] = self.terrain["nodata_value"]
+        write_esri_ascii(
+            os.path.join(output_folder, "max_water_depth.asc"),
+            self.model_grid,
+            "max_surface_water__depth",
+            clobber=True,
+        )
+        max_surf_water_file_path = os.path.join(
+            output_folder, "max_surface_water_depth_final.json"
+        )
+        data = []
+        for i in np.arange(0, len(self.model_grid.at_node["max_surface_water__depth"])):
+            y, x = np.unravel_index(i, self.model_grid.shape)
+            data.append(
+                {
+                    "x": int(x),  # "x" in json is col of the model grid
+                    "y": int(y),  # "y" in json is row of the model grid
+                    "z": self.model_grid.at_node["max_surface_water__depth"][i],
+                }
+            )
+
+        with open(max_surf_water_file_path, "w") as file:
+            json.dump(data, file, indent=4)
+
         # calculate cumulative discharge at outlet
         outlet_result["time_diff"] = outlet_result["time"].diff()
         outlet_result.at[0, "time_diff"] = outlet_result["time"].iloc[0]
@@ -328,7 +493,38 @@ class FloodSimulator:
         ]
         cum_flow_vol = outlet_result["cum_discharge_vol"].iloc[-1]
 
-        # save outlet related results
+        # calculate total surface water volume at the end of simulation
+        surface_water_depth = self.model_grid.at_node["surface_water__depth"]
+        surface_water_depth[
+            self.model_grid.at_node["topographic__elevation"] == -9999.0
+        ] = 0
+        total_surface_water_vol = surface_water_depth.sum() * (
+            self.model_grid.dx * self.model_grid.dy
+        )
+
+        # calculate total infiltration volume at the end of simulation
+        if self.model_run["activate_inf"]:
+            infil_depth = self.model_grid.at_node["soil_water_infiltration__depth"]
+            infil_depth[
+                self.model_grid.at_node["topographic__elevation"] == -9999.0
+            ] = 0
+            # !! testing
+            # write_esri_ascii(
+            #     os.path.join(output_folder, "infil_result_depth.asc"),
+            #     self.model_grid,
+            #     "soil_water_infiltration__depth",
+            #     clobber=True,
+            # )
+            infil_volume = infil_depth * (self.model_grid.dx * self.model_grid.dy)
+            total_infil_volume = infil_volume.sum()
+
+        else:
+            total_infil_volume = 0
+
+        # calculate total water input
+        total_water_vol = total_infil_volume + total_surface_water_vol + cum_flow_vol
+
+        # save outlet time series results
         outlet_result.to_csv(
             os.path.join(
                 (
@@ -340,6 +536,7 @@ class FloodSimulator:
             )
         )
 
+        # save cumulative discharge results
         with open(
             os.path.join(
                 (
@@ -351,13 +548,50 @@ class FloodSimulator:
             ),
             "w",
         ) as file:
-            # Write the value to the file
-            file.write(str(cum_flow_vol) + " cubic meters")
+            file.write(
+                f"{round(cum_flow_vol / total_water_vol * 100, 3)} "
+                f"% of total water volume\n"
+            )
+            file.write(f"{cum_flow_vol} m3 cumulative discharge volume at outlet\n")
 
-        # File is automatically
-        # # save max surface water depth
-        # max_depth = self.model_grid.at_node['max_surface_water__depth']
-        # max_depth[max_depth == 1e-12] = 0
+        # save total infiltration results
+        with open(
+            os.path.join(
+                (
+                    self.output["output_folder"]
+                    if os.path.isdir(self.output["output_folder"])
+                    else os.getcwd()
+                ),
+                "infil_result.txt",
+            ),
+            "w",
+        ) as file:
+            file.write(
+                f"{round(total_infil_volume / total_water_vol * 100, 3)} "
+                f"% of total water volume\n"
+            )
+            file.write(f"{total_infil_volume} m3 total infiltration volume\n")
+
+        # save total surface water volume result
+        with open(
+            os.path.join(
+                (
+                    self.output["output_folder"]
+                    if os.path.isdir(self.output["output_folder"])
+                    else os.getcwd()
+                ),
+                "total_surf_water_result.txt",
+            ),
+            "w",
+        ) as file:
+            file.write(
+                f"{round(total_surface_water_vol / total_water_vol * 100, 3)} "
+                f"% of total rainfall volume\n"
+            )
+            file.write(
+                f"{total_surface_water_vol} m3 "
+                f"total surface water volume at final step\n"
+            )
 
         # # as csv
         # df = pd.DataFrame(max_depth, columns=['z_value'])
@@ -366,11 +600,6 @@ class FloodSimulator:
         #     if os.path.isdir(self.output['output_folder']) else os.getcwd(),
         #     'max_water_depth.csv')
         # )
-
-        # as ascii
-        # write_esri_ascii(os.path.join(output_folder, "max_water_depth.asc"),
-        #                  self.model_grid, 'max_surface_water__depth',
-        #                  clobber=True)
 
         # write_esri_ascii(os.path.join(output_folder, "max_discharge.asc"),
         #                  self.model_grid, 'test_max_discharge', clobber=True

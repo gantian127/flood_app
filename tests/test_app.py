@@ -2,11 +2,12 @@
 Unit tests for flooding web app (async version)
 """
 
-import pytest
 import json
-import uuid
-import time
 import sys
+import time
+import uuid
+
+import pytest
 
 from flood_app import create_app, settings
 
@@ -27,9 +28,9 @@ def headers():
 
 
 @pytest.fixture(scope="module")
-def valid_uuid():
-    """Create an uuid for valid request and check its status"""
-    return str(uuid.uuid4())
+def valid_uuids():
+    """Create a list uuid for valid requests and check the status"""
+    return [str(uuid.uuid4()), str(uuid.uuid4())]
 
 
 @pytest.fixture(scope="module")
@@ -66,7 +67,7 @@ def test_submit_simulation_forbidden(client):
 
 def test_submit_simulation_time_out(client, timeout_uuid, headers, shared_datadir):
     """Test submitting a simulation with time out error."""
-    with open(shared_datadir / "test_request_json_valid.json") as fp:
+    with open(shared_datadir / "test_request_geojson_valid.json") as fp:
         request_data = json.load(fp)
     request_data["simulationId"] = timeout_uuid
     request_data["timeout"] = 5  # adjust time out with shorter value for testing
@@ -85,24 +86,31 @@ def test_submit_simulation_time_out(client, timeout_uuid, headers, shared_datadi
     )
 
 
-def test_submit_simulation_valid_request(client, valid_uuid, headers, shared_datadir):
+def test_submit_simulation_valid_requests(client, valid_uuids, headers, shared_datadir):
     """Test submitting a valid request"""
-    with open(shared_datadir / "test_request_json_valid.json") as fp:
-        request_data = json.load(fp)
-    request_data["simulationId"] = valid_uuid
 
-    response = client.post(
-        "/submit_simulation",
-        headers=headers,
-        data=json.dumps(request_data),
-        content_type="application/json",
-    )
+    for i in range(0, len(valid_uuids)):
+        with open(shared_datadir / "test_request_geojson_valid.json") as fp:
+            request_data = json.load(fp)
+        request_data["simulationId"] = valid_uuids[i]
 
-    assert response.status_code == 200
-    assert (
-        f"Request {request_data['simulationId']} is received."
-        in response.json["message"]
-    )
+        if i == 0:
+            request_data["modelParameters"]["activateInfiltration"] = True
+        else:
+            del request_data["modelParameters"]  # no model parameter settings
+
+        response = client.post(
+            "/submit_simulation",
+            headers=headers,
+            data=json.dumps(request_data),
+            content_type="application/json",
+        )
+
+        assert response.status_code == 200
+        assert (
+            f"Request {request_data['simulationId']} is received."
+            in response.json["message"]
+        )
 
 
 def test_submit_simulation_invalid_id(client, headers):
@@ -123,10 +131,10 @@ def test_submit_simulation_invalid_id(client, headers):
     assert "Please provide a valid simulation ID." in response.json["error"]
 
 
-def test_submit_simulation_existing_id(client, valid_uuid, headers):
+def test_submit_simulation_existing_id(client, valid_uuids, headers):
     """Test submitting a simulation with an existing UUID"""
     request_data = {
-        "simulationId": valid_uuid,
+        "simulationId": valid_uuids[0],
         "map": "some map data",
         "timeout": 100000,
     }
@@ -214,9 +222,9 @@ def test_check_status_timeout_id(client, timeout_uuid):
     )
 
 
-def test_check_status_valid_id(client, valid_uuid):
+def test_check_status_valid_id(client, valid_uuids):
     """Test checking the status of a valid simulation id"""
-    response = client.get(f"/check_status/{valid_uuid}")
+    response = client.get(f"/check_status/{valid_uuids[0]}")
 
     assert response.status_code == 200
     assert (

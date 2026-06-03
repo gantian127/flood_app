@@ -1,7 +1,7 @@
 import click
 
-from flood_app.start import start
 from flood_app._version import __version__
+from flood_app.start import start
 
 
 @click.command()

@@ -1,125 +1,87 @@
-Flood App
-============
 
-A web application for overland flow simulation using `Landlab <https://github.com/landlab/landlab>`_.
+.. image:: docs/_static/logo.png
+    :alt: Flood App logo
+    :width: 400px
+    :align: center
+
+.. image:: https://readthedocs.org/projects/flood-app/badge/?version=latest
+    :target: https://flood-app.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
+.. .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.18475558.svg
+..     :target: https://doi.org/10.5281/zenodo.18475558
+..     :alt: DOI
+
+.. image:: https://img.shields.io/badge/License-MIT-blue.svg
+    :target: https://opensource.org/licenses/MIT
+
+Flood App is a RESTful web service that integrates with the
+`Fora.ai platform <https://fora.northeastern.edu/>`_ to support participatory
+watershed modeling. Built on `Landlab <https://landlab.csdms.io/>`_, the service
+performs watershed-scale simulations of surface runoff and soil infiltration based
+on user-defined landscape conditions and mitigation interventions.
+
+Community users interact through the Fora.ai platform to design modeling scenarios
+that incorporate mitigation measures such as berms and mulch. Fora.ai sends
+GeoJSON-based map data to Flood App through a REST API, where the inputs are
+translated into physics-based simulations using Landlab components. Simulations are
+executed asynchronously and the results are returned to Fora.ai for visualization,
+scenario comparison, and decision support.
 
 Installation
-+++++++++++++
+------------
 
-Use `conda` to install the necessary requirements and `flood_app`.
-Please edit /flood_app/flood_app/settings.py file to define the API_KEY after
-downloading the code.
+Clone the repository, install dependencies with conda, then install the package:
 
+.. code-block:: bash
 
-.. code::
+    git clone https://github.com/gantian127/flood_app
+    cd flood_app
+    conda install --file=requirements.txt -c conda-forge
+    pip install -e .
 
-    $ git clone https://github.com/gantian127/flood_app
-    $ cd flood_app
-    $ conda install --file=requirements.txt -c conda-forge
-    $ pip install .
+Start the server:
 
+.. code-block:: bash
 
-.. code::
+    start-app --port=80 --host=0.0.0.0
 
-    $ start-app --port=80 --host=0.0.0.0
+Documentation
+-------------
 
-Look at the line containing `Serving on` to see what host and port the
-server is running on. Alternatively, you can use the `--host` and `--port`
-options to specify a specific host and port (`--help` for help).
+Please read the `Full documentation <https://flood-app.readthedocs.io>`_ on ReadTheDocs
+for detailed information on installation, API usage, and examples.
 
-.. This is comments
-    Opt.2 Use Docker
-    ----------------
-    **Method 1: Build docker image with a Docker file**
-    To build a new docker image with a
-    `Docker file <https://github.com/gantian127/flood_app/blob/master/Dockerfile>`_
-    that will be a flood_app server,
-    .. code::
-        docker build . -t flood_app
-    After building, run the server,
-    .. code::
-        docker run -it -p 80:80 flood_app
-    **Method 2: Pull docker image from the Docker Hub**
-    To pull the docker image that will be a flood_app server,
-    .. code::
-        docker pull gantian127/flood_app:latest
-    After building, run the server,
-    .. code::
-        docker run -it -p 80:80 gantian127/flood_app
-    Once running, you can open a web browser and go to http://0.0.0.0, which will show a
-    user interface to run the overland flow simulation.
-..
 
 API Specification
-+++++++++++++++++
-This API allows users to submit and check the status of overland flow simulations.
+-----------------
 
-Endpoints
----------
-**1. Submit Simulation**
+For the API specification including request/response formats and examples,
+see the `API Documentation <https://flood-app.readthedocs.io/en/latest/endpoints.html>`_.
 
-**URL:** POST /submit_simulation
+Contributing
+------------
 
-**Description:** Submit request for a new overland flow simulation.
+Contributions are welcome! Please read
+`CONTRIBUTING <https://github.com/gantian127/flood_app/blob/master/CONTRIBUTING.rst>`_
+for guidelines on reporting issues and submitting pull requests.
 
+License
+-------
 
-**Request Headers:**
+MIT — see
+`LICENSE <https://github.com/gantian127/flood_app/blob/master/LICENSE.rst>`_
+for details.
 
-.. code::
+Citation
+--------
 
-    Authorization: Bearer API_KEY
-    Content-Type: application/json
+If you use Flood App in your research, please cite it using the metadata in
+`CITATION.cff <https://github.com/gantian127/flood_app/blob/master/CITATION.cff>`_
+or via the GitHub "Cite this repository" button.
 
-**Request Body:**
+Credits
+-------
 
-.. code::
-
-    {
-      "map": {map_json_string},
-      "simulationId": "uuid",
-      "timeout": 300
-    }
-
-    Content-Type: application/json
-
-**Responses:**
-
-- ✅ 200 OK – Simulation received
-- ❌ 400 Bad Request – Missing or invalid parameters
-- ❌ 401 Unauthorized – API key missing or incorrect
-- ❌ 403 Forbidden – Invalid API key
-
-**Example:**
-
-.. code::
-
-    curl -X POST "http://0.0.0.0/submit_simulation" \
-         -H "Authorization: Bearer API_KEY_as_64-character_hex_string" \
-         -H "Content-Type: application/json" \
-         -d @example_request.json
-
-- An example JSON file for example_request.json can be found `here <tests/data/test_request_geojson_valid.json>`_.
-
-
-**2. Check Simulation Status**
-
-**URL:** GET /check_status/{simulation_id}
-
-**Description:** Check the current status of a simulation.
-
-**Responses:**
-
-- ✅ 200 OK – Simulation is complete or processing
-- ❌ 400 Bad Request – Simulation ID is invalid or not found
-- ❌ 500 Internal Server error – Simulation is failed
-
-**Example:**
-
-.. code::
-
-    # check status only
-    curl "http://0.0.0.0/check_status/2f144dc1-25a6-484f-91d0-42ddb0ef75bb"
-
-    # download file
-    curl "http://0.0.0.0/check_status/2f144dc1-25a6-484f-91d0-42ddb0ef75bb?download=true" \
-          --output /local_path/output.zip
+See `CREDITS <https://github.com/gantian127/flood_app/blob/master/CREDITS.rst>`_
+for the list of contributors and acknowledgments.

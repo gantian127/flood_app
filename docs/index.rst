@@ -11,3 +11,9 @@ infiltration using `Landlab <https://github.com/landlab/landlab>`_ model compone
    introduction
    installation
    endpoints
+
+.. toctree::
+   :caption: Links
+   :maxdepth: 1
+
+   GitHub Repository <https://github.com/gantian127/flood_app>

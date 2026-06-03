@@ -29,6 +29,11 @@ autodoc_mock_imports = [
 ]
 
 html_theme = "furo"
+html_theme_options = {
+    "source_repository": "https://github.com/gantian127/flood_app",
+    "source_branch": "master",
+    "source_directory": "docs/",
+}
 html_logo = "_static/Logo.png"
 html_title = "Flood App"
 

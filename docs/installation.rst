@@ -48,6 +48,55 @@ Look at the line containing `Serving on` to see what host and port the
 server is running on. Alternatively, you can use the `--host` and `--port`
 options to specify a specific host and port (`--help` for help).
 
+Development Tools
+-----------------------
+
+`Nox <https://nox.thea.codes/>`_ is used to automate testing, linting, and
+building the documentation. Install it with:
+
+.. code-block:: bash
+
+    pip install nox
+
+Available sessions:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 40 30
+
+   * - Command
+     - Description
+     - Python versions
+   * - ``nox -s test``
+     - Run the test suite with coverage report
+     - 3.11, 3.12, 3.13
+   * - ``nox -s lint``
+     - Run ruff linter and formatter check
+     - default
+   * - ``nox -s docs``
+     - Build the Sphinx HTML documentation
+     - default
+
+To run all sessions:
+
+.. code-block:: bash
+
+    nox
+
+To run a specific session:
+
+.. code-block:: bash
+
+    nox -s test
+    nox -s lint
+    nox -s docs
+
+To run tests against a specific Python version:
+
+.. code-block:: bash
+
+    nox -s test-3.12
+
 
 .. Requirements
 .. ------------

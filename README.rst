@@ -14,9 +14,9 @@
 ..    :target: https://flood-app.readthedocs.io/en/latest/?badge=latest
 ..    :alt: Documentation Status
 
-.. .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.18475558.svg
-..     :target: https://doi.org/10.5281/zenodo.18475558
-..     :alt: DOI
+.. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.20533595.svg
+    :target: https://doi.org/10.5281/zenodo.20533595
+    :alt: DOI
 
 Flood App is a RESTful web service that integrates with the
 `Fora.ai platform <https://fora.northeastern.edu/>`_ to support participatory

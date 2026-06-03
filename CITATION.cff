@@ -15,6 +15,8 @@ authors:
     affiliation: "Community Surface Dynamics Modeling System (CSDMS)"
 version: "0.3.0"
 date-released: "2026-06-03"
+doi: 10.5281/zenodo.20533595
+publisher: Zenodo
 license: MIT
 repository-code: "https://github.com/gantian127/flood_app"
 url: "https://github.com/gantian127/flood_app"

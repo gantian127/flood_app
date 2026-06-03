@@ -1,5 +1,5 @@
 
-.. image:: docs/_static/logo.png
+.. image:: docs/_static/Logo.png
     :alt: Flood App logo
     :width: 400px
     :align: center
@@ -50,7 +50,7 @@ Documentation
 -------------
 
 Please read the `Full documentation <https://flood-app.readthedocs.io>`_ on ReadTheDocs
-for detailed information on installation, API usage, and examples.
+for detailed information about Flood App.
 
 
 API Specification

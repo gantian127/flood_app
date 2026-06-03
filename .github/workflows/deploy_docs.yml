@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - master
+    paths:
+      - "docs/**"
+      - "noxfile.py"
+      - "pyproject.toml"
 
 permissions:
   contents: read

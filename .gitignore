@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.eggs/
+
+# Distribution / build
+build/
+dist/
+
+# Testing
+.coverage
+.pytest_cache/
+.nox
+htmlcov/
+
+# Docs
+docs/_build/
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+
+# App runtime
+user_upload/
+mapdata/
+app_testing/

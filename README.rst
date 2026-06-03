@@ -52,7 +52,7 @@ Start the server:
 Documentation
 -------------
 
-Please read the `Full documentation <https://gantian127.github.io/flood_app/>`_ on ReadTheDocs
+Please read the `Full documentation <https://gantian127.github.io/flood_app/>`_
 for detailed information about Flood App.
 
 

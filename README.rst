@@ -1,4 +1,3 @@
-
 .. image:: docs/_static/Logo.png
     :alt: Flood App logo
     :width: 400px

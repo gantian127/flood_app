@@ -16,10 +16,9 @@ def test(session):
 
 @nox.session
 def lint(session):
-    """Run linting and formatting."""
-    session.install("ruff")
-    session.run("ruff", "check", "flood_app", "tests", "--fix")
-    session.run("ruff", "format", "flood_app", "tests")
+    """Run linting and formatting via pre-commit."""
+    session.install("pre-commit")
+    session.run("pre-commit", "run", "--all-files")
 
 
 @nox.session

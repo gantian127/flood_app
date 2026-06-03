@@ -2,11 +2,12 @@
 Unit tests for flooding web app (async version)
 """
 
-import pytest
 import json
-import uuid
-import time
 import sys
+import time
+import uuid
+
+import pytest
 
 from flood_app import create_app, settings
 

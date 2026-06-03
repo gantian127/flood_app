@@ -9,12 +9,12 @@ hydraulic conductivity:
 - GREEN-AMPT INFILTRATION PARAMETERS. FROM SOILS DATA. By Walter J. Rawls et al. 1982
 """
 
-import os
 import json
+import os
 
 import numpy as np
 from landlab import RasterModelGrid
-from landlab.components import FlowAccumulator, ChannelProfiler
+from landlab.components import ChannelProfiler, FlowAccumulator
 from landlab.utils import get_watershed_mask
 
 # utility functions for app.py file

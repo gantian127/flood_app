@@ -18,23 +18,23 @@ $ python flood_simulator.py config_file.toml
 
 """
 
-import sys
 import os
+import sys
 import time
 
 try:
     import tomllib
 except ModuleNotFoundError:
     import tomli as tomllib
-import rasterio
-from tqdm import trange
-import pandas as pd
-import numpy as np
 import json
 
-from landlab.io import read_esri_ascii, write_esri_ascii
-from landlab.grid.mappers import map_mean_of_link_nodes_to_link
+import numpy as np
+import pandas as pd
+import rasterio
 from landlab.components import OverlandFlow, SoilInfiltrationGreenAmpt
+from landlab.grid.mappers import map_mean_of_link_nodes_to_link
+from landlab.io import read_esri_ascii, write_esri_ascii
+from tqdm import trange
 
 
 class FloodSimulator:

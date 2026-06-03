@@ -9,14 +9,15 @@ app.run(debug=True, port=5001)
 
 import os
 import shutil
-import toml
-import uuid
 import threading
 import traceback
+import uuid
 
-from flask import Flask, render_template, request, jsonify, send_file, current_app
-from .model import FloodSimulator
+import toml
+from flask import Flask, current_app, jsonify, render_template, request, send_file
+
 from .evaluation import ModelEvaluation
+from .model import FloodSimulator
 from .settings import API_KEY
 from .utils import create_ascii_files_from_geojson
 

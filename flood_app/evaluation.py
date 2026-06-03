@@ -9,8 +9,10 @@ with the model results
 """
 
 import os
+
 import numpy as np
 import rasterio
+
 from .utils import calculate_npv
 
 # !! Testing

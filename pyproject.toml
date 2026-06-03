@@ -1,24 +1,28 @@
 [build-system]
-requires = ["cython", "numpy", "setuptools", "wheel"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "flood_app"
-description = "A RESTful interface to run Landlab overland flow component."
+description = """
+A RESTful web service for watershed-scale simulation of surface runoff and
+soil infiltration using Landlab model components.
+"""
 authors = [
-  {email = "gantian127@gmail.com"},
-  {name = "CSDMS"}
+  {name = "Tian Gan", email = "gantian127@gmail.com"},
+  {name = "CSDMS"},
 ]
 maintainers = [
-  {email = "gantian127@gmail.com"},
-  {name = "CSDMS"}
+  {name = "Tian Gan", email = "gantian127@gmail.com"},
 ]
 keywords = [
   "landlab",
-  "component modeling",
+  "overland flow",
+  "soil infiltration",
+  "flood simulation",
+  "hydrology",
   "earth science",
-  "model coupling",
-  "numerical modeling",
+  "participatory modeling",
 ]
 license = {file = "LICENSE.rst"}
 classifiers = [
@@ -30,37 +34,33 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: Implementation :: CPython",
-  "Topic :: Scientific/Engineering :: Physics",  
+  "Topic :: Scientific/Engineering :: Hydrology",
+  "Topic :: Scientific/Engineering :: Physics",
 ]
 requires-python = ">=3.11"
 dependencies = [
-    "numpy",
-    "cherrypy",
-    "click",
-    "flask",
-    "flask-cors",
-    "landlab==2.10.0",
-    "rasterio",
-    "tqdm",
-    "toml",
+  "numpy",
+  "cherrypy",
+  "click",
+  "flask",
+  "flask-cors",
+  "landlab==2.10.0",
+  "rasterio",
+  "tqdm",
+  "toml",
 ]
 dynamic = ["readme", "version"]
 
 [project.urls]
-documentation = "https://github.com/gantian127/flood_app#readme"
-repository = "https://github.com/gantian127/flood_app"
-#changelog = "https://github.com/gantian127/flood_app/blob/develop/CHANGES.rst"
+Documentation = "https://flood-app.readthedocs.io"
+Repository = "https://github.com/gantian127/flood_app"
+Changelog = "https://github.com/gantian127/flood_app/blob/master/CHANGES.rst"
 
 [project.optional-dependencies]
 dev = [
-  "black",
-  "coveralls",
-  "flake8",
-  "flake8-bugbear",
-  "isort",
+  "nox",
   "pre-commit",
-  "towncrier",
-  "zest.releaser[recommended]",
+  "ruff",
 ]
 testing = [
   "pytest",
@@ -74,7 +74,6 @@ start-app = "flood_app.cli:main"
 [tool.setuptools]
 packages = ["flood_app"]
 
-# need to add this line to include templates files
 [tool.setuptools.package-data]
 "flood_app" = ["templates/*", "static/*", "config_file.toml"]
 
@@ -97,41 +96,11 @@ addopts = """
 doctest_optionflags = [
   "NORMALIZE_WHITESPACE",
   "IGNORE_EXCEPTION_DETAIL",
-  "ALLOW_UNICODE"
+  "ALLOW_UNICODE",
 ]
 
-[tool.isort]
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-combine_as_imports = true
-line_length = 88
+[tool.ruff]
+line-length = 88
 
-#[tool.towncrier]
-#directory = "news"
-#package = "flood_app"
-#filename = "CHANGES.rst"
-#single_file = true
-#underlines = "-`^"
-#issue_format = "`#{issue} <https://github.com/gantian127/flood_app/issues/{issue}>`_"
-#title_format = "{version} ({project_date})"
-
-#[[tool.towncrier.type]]
-#directory = "feature"
-#name = "New Features"
-#showcontent = true
-#
-#[[tool.towncrier.type]]
-#directory = "bugfix"
-#name = "Bug Fixes"
-#showcontent = true
-#
-#[[tool.towncrier.type]]
-#directory = "docs"
-#name = "Documentation Enhancements"
-#showcontent = true
-#
-#[[tool.towncrier.type]]
-#directory = "misc"
-#name = "Other Changes and Additions"
-#showcontent = true
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]

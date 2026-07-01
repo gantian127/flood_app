@@ -197,7 +197,7 @@ class ModelEvaluation:
         berm_maintain_cost = 3  # dollar/m3/year
 
         # pre-defined criteria for mulching
-        mulching_install_cost = 0.5  # dollar/m2
+        mulching_install_cost = 0.9  # dollar/m2 for wood shred   0.5 for without flight
         mulching_maintain_cost = mulching_install_cost * 0.05  # dollar/m2/year
 
         # pre-define inflation rate for 20 years

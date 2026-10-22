@@ -10,7 +10,8 @@ the service performs watershed-scale simulations of surface runoff and soil
 infiltration based on user-defined landscape conditions and mitigation interventions.
 
 Community users interact through the Fora.ai platform to discuss, collaborate, and
-design modeling scenarios that incorporate mitigation measures such as berms and mulch.
+design modeling scenarios that incorporate mitigation measures such as berms, mulch,
+and post-assisted log structures (PALS).
 Fora.ai sends GeoJSON-based map data to Flood App through a REST API, where the inputs
 are processed and translated into physics-based simulations using Landlab components.
 Simulations are executed asynchronously, and the resulting outputs are returned to
@@ -29,7 +30,7 @@ management decisions.
 Intervention Types
 -----------------------
 
-Three intervention types can be applied to landscape cells via the GeoJSON input.
+Four intervention types can be applied to landscape cells via the GeoJSON input.
 
 .. list-table::
    :header-rows: 1
@@ -43,6 +44,9 @@ Three intervention types can be applied to landscape cells via the GeoJSON input
      - Raises cell elevation by 2 m and adjusts hydraulic conductivity and Manning’s roughness.
    * - ``mulch``
      - Modifies hydraulic conductivity and Manning’s roughness; no change to terrain elevation.
+   * - ``logwall``
+     - Represents one PALS per selected cell. Modifies Manning’s roughness; no change to
+       terrain elevation or other model parameters.
 
 Input Example
 ---------------------

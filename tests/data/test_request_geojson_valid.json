@@ -18242,7 +18242,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -18440,7 +18458,25 @@
             "count": 55,
             "percent": "85.94"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -27934,7 +27970,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -99988,7 +100042,25 @@
             "count": 55,
             "percent": "85.94"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -108745,7 +108817,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -185452,7 +185542,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -201860,7 +201968,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -234599,7 +234725,25 @@
             "count": 56,
             "percent": "87.50"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -244430,7 +244574,25 @@
             "count": 43,
             "percent": "67.19"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -253366,7 +253528,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -288957,7 +289137,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -305089,7 +305287,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -319581,7 +319797,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -337631,7 +337865,25 @@
             "count": 59,
             "percent": "92.19"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -358775,7 +359027,25 @@
             "count": 72,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -407297,7 +407567,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -411665,7 +411953,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -416197,7 +416503,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -426265,7 +426589,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -432292,7 +432634,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -433489,7 +433849,25 @@
             "count": 39,
             "percent": "60.94"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -434275,7 +434653,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -452657,7 +453053,25 @@
             "count": 72,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -460135,7 +460549,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -478638,7 +479070,25 @@
             "count": 50,
             "percent": "78.13"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -513485,7 +513935,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -538494,7 +538962,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -560189,7 +560675,25 @@
             "count": 61,
             "percent": "95.31"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -570560,7 +571064,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -588772,7 +589294,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -605046,7 +605586,25 @@
             "count": 53,
             "percent": "82.81"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -611598,7 +612156,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -626401,7 +626977,25 @@
             "count": 61,
             "percent": "95.31"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -630589,7 +631183,25 @@
             "count": 59,
             "percent": "92.19"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -654019,7 +654631,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -664645,7 +665275,25 @@
             "count": 36,
             "percent": "56.25"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -676523,7 +677171,25 @@
             "count": 25,
             "percent": "39.06"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -685266,7 +685932,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -703826,7 +704510,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -739060,7 +739762,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -762383,7 +763103,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -768680,7 +769418,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -776114,7 +776870,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -780635,7 +781409,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -780842,7 +781634,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -789814,7 +790624,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -814308,7 +815136,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -824750,7 +825596,25 @@
             "count": 21,
             "percent": "32.81"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -844398,7 +845262,25 @@
             "count": 7,
             "percent": "10.94"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {
@@ -865424,7 +866306,25 @@
             "count": 64,
             "percent": "100.00"
           },
-          "tokens": []
+          "tokens": [
+            {
+              "label": "Log Wall (PALS)",
+              "type": "logwall",
+              "cssColor": "#6b4423",
+              "opacity": 0.7,
+              "shape": "square",
+              "size": 2,
+              "validOn": [],
+              "tooltip_title": "Post-Assisted Log Structure",
+              "description": "A post-assisted log structure built primarily with locally available woody material to increase local flow resistance.",
+              "icon": "mdiForest",
+              "iconImage": "logwall",
+              "placement": "Any except road and building",
+              "cost": 1450,
+              "maintenance_cost": "$0/year",
+              "total_cost": "$1,450"
+            }
+          ]
         }
       },
       {

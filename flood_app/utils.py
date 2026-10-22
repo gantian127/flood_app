@@ -29,6 +29,7 @@ MANNING_MAPPING = {
     "berm_low": 0.03,
     "berm_high": 0.03,
     "mulch": 0.06,
+    "logwall": 0.07,
 }
 
 CONDUCTIVITY_MAPPING = {
@@ -55,6 +56,7 @@ LANDTYPE_MAPPING = {
     "berm_low": 50,
     "berm_high": 51,
     "mulch": 60,
+    "logwall": 70,
 }
 
 
@@ -138,6 +140,9 @@ def create_ascii_files_from_geojson(
                 land_type[x][y] = LANDTYPE_MAPPING["mulch"]
                 mannings_n[x][y] = MANNING_MAPPING["mulch"]
                 conductivity[x][y] = CONDUCTIVITY_MAPPING["mulch"]
+            elif intervention_type == "logwall":
+                land_type[x][y] = LANDTYPE_MAPPING["logwall"]
+                mannings_n[x][y] = MANNING_MAPPING["logwall"]
 
     # watershed delineation
     outlet_id = -1

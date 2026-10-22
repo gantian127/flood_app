@@ -34,6 +34,7 @@ class ModelEvaluation:
         "berm_low": 50,
         "berm_high": 51,
         "mulch": 60,
+        "logwall": 70,
     }
 
     def __init__(
@@ -75,6 +76,7 @@ class ModelEvaluation:
             mulching_investment,
             berm1_investment,
             berm2_investment,
+            logwall_investment,
         ) = self.calc_investment()  # TODO: only keep investment in the future
 
         # write results as a text file
@@ -94,6 +96,7 @@ class ModelEvaluation:
             f.write(f"cost of mulching (dollars):{mulching_investment}\n")
             f.write(f"cost of 1m berm (dollars): {berm1_investment}\n")
             f.write(f"cost of 2m berm (dollars): {berm2_investment}\n")
+            f.write(f"cost of log walls (dollars): {logwall_investment}\n")
 
         return eval_result_path
 
@@ -187,7 +190,7 @@ class ModelEvaluation:
         )
 
     def calc_investment(self):
-        """Estimate the cost of interventions: mulching, berm"""
+        """Estimate the cost of berm, mulch, and log-wall (PALS) interventions."""
 
         # pre-defined criteria for berm
         berm_width = 2  # meter
@@ -199,6 +202,13 @@ class ModelEvaluation:
         # pre-defined criteria for mulching
         mulching_install_cost = 0.9  # dollar/m2 for wood shred   0.5 for without flight
         mulching_maintain_cost = mulching_install_cost * 0.05  # dollar/m2/year
+
+        # pre-defined criteria for log-wall.
+        # The modeled installation cost combines a $1,150 direct installation estimate
+        # with a $300 One-time post-flood repair allowance.
+        # It assumes locally available wood and minimal transport.
+        logwall_install_cost = 1450  # dollar/structure
+        logwall_maintain_cost = 0  # no scheduled annual maintenance
 
         # pre-define inflation rate for 20 years
         # take 2025 inflation rate 2.5% for first two years,
@@ -239,7 +249,23 @@ class ModelEvaluation:
             mulching_cells * self.cell_area * mulching_npv["total_cost"], 2
         )
 
-        investment = berm1_investment + berm2_investment + mulching_investment
+        # cost of log walls
+        logwall_cells = np.sum(self.land_type == self.LAND_TYPE["logwall"])
+        logwall_npv = calculate_npv(
+            logwall_install_cost,
+            logwall_maintain_cost,
+            inflation_rates,
+            discount_rate,
+        )
+        # one pixel includes only one PALS, independent of cell area
+        logwall_investment = round(logwall_cells * logwall_npv["total_cost"], 2)
+
+        investment = (
+            berm1_investment
+            + berm2_investment
+            + mulching_investment
+            + logwall_investment
+        )
 
         # !! Testing
         # print(f"number of cells: berm 2m: {berm2_cells}, berm 1m：{berm1_cells}, "
@@ -249,4 +275,10 @@ class ModelEvaluation:
         # print(f"total investment: {investment}")
 
         # TODO, only keep investment when efficiency function is implemented
-        return investment, mulching_investment, berm1_investment, berm2_investment
+        return (
+            investment,
+            mulching_investment,
+            berm1_investment,
+            berm2_investment,
+            logwall_investment,
+        )

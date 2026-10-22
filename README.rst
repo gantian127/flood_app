@@ -25,7 +25,8 @@ performs watershed-scale simulations of surface runoff and soil infiltration bas
 on user-defined landscape conditions and mitigation interventions.
 
 Community users interact through the Fora.ai platform to design modeling scenarios
-that incorporate mitigation measures such as berms and mulch. Fora.ai sends
+that incorporate mitigation measures such as berms, mulch, and post-assisted log
+structures (PALS). Fora.ai sends
 GeoJSON-based map data to Flood App through a REST API, where the inputs are
 translated into physics-based simulations using Landlab components. Simulations are
 executed asynchronously and the results are returned to Fora.ai for visualization,

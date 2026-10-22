@@ -3,6 +3,16 @@ Changelog
 
 All notable changes to this project are documented here.
 
+Unreleased
+----------
+
+New Features
+~~~~~~~~~~~~
+
+- Added the ``logwall`` (PALS Post-Assisted Log Structure) intervention with land-type
+  index 70 and Manning's n of 0.07. Each selected cell represents one structure
+  with a modeled investment of $1,450 and no scheduled annual maintenance.
+
 0.3.0 (2026-06-03)
 ------------------
 

@@ -7,9 +7,12 @@ import sys
 import time
 import uuid
 
+import numpy as np
 import pytest
 
 from flood_app import create_app, settings
+from flood_app.evaluation import ModelEvaluation
+from flood_app.utils import create_ascii_files_from_geojson
 
 
 @pytest.fixture
@@ -111,6 +114,38 @@ def test_submit_simulation_valid_requests(client, valid_uuids, headers, shared_d
             f"Request {request_data['simulationId']} is received."
             in response.json["message"]
         )
+
+
+def test_intervention_investment(shared_datadir, tmp_path):
+    """Check investment totals using the shared valid-request fixture."""
+    with open(shared_datadir / "test_request_geojson_valid.json") as fp:
+        request_data = json.load(fp)
+
+    ascii_files = create_ascii_files_from_geojson(
+        request_data["map"],
+        tmp_path,
+        geojson_str=True,
+        intervention=request_data["modelIntervention"],
+    )
+
+    model_eval = ModelEvaluation.__new__(ModelEvaluation)
+    model_eval.land_type = np.loadtxt(ascii_files["land_type"], skiprows=6)
+    model_eval.cell_size = request_data["map"]["properties"]["squareSize"]
+    model_eval.cell_area = model_eval.cell_size**2
+
+    (
+        investment,
+        mulching_investment,
+        berm1_investment,
+        berm2_investment,
+        logwall_investment,
+    ) = model_eval.calc_investment()
+
+    assert mulching_investment == pytest.approx(292110.00)
+    assert berm1_investment == pytest.approx(601071.20)
+    assert berm2_investment == pytest.approx(1020423.20)
+    assert logwall_investment == pytest.approx(72500.00)
+    assert investment == pytest.approx(1986104.40)
 
 
 def test_submit_simulation_invalid_id(client, headers):

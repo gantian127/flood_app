@@ -169,13 +169,14 @@ def create_ascii_files_from_geojson(
     }
 
     header_lines = [f"{key} {str(val)}" for key, val in list(header.items())]
+    header_text = "\n".join(header_lines)
 
     # save elevation data
     elev_path = os.path.join(output_folder, "elevation.txt")
     np.savetxt(
         elev_path,
         np.flipud(elevation),
-        header=os.linesep.join(header_lines),
+        header=header_text,
         comments="",
     )
 
@@ -184,7 +185,7 @@ def create_ascii_files_from_geojson(
     np.savetxt(
         land_type_path,
         np.flipud(land_type),
-        header=os.linesep.join(header_lines),
+        header=header_text,
         comments="",
         fmt="%d",
     )
@@ -194,7 +195,7 @@ def create_ascii_files_from_geojson(
     np.savetxt(
         mannings_n_path,
         np.flipud(mannings_n),
-        header=os.linesep.join(header_lines),
+        header=header_text,
         comments="",
         fmt="%.4f",
     )
@@ -204,7 +205,7 @@ def create_ascii_files_from_geojson(
     np.savetxt(
         conductivity_path,
         np.flipud(conductivity),
-        header=os.linesep.join(header_lines),
+        header=header_text,
         comments="",
         fmt="%.4e",
     )
@@ -265,6 +266,7 @@ def create_ascii_files(dem_info, output_folder, json_str=False, delineation=Fals
     }
 
     header_lines = [f"{key} {str(val)}" for key, val in list(header.items())]
+    header_text = "\n".join(header_lines)
 
     # refine elevation data
     elevation = np.where(land_type == "water", -9999, elevation)  # replace water area
@@ -277,7 +279,7 @@ def create_ascii_files(dem_info, output_folder, json_str=False, delineation=Fals
     np.savetxt(
         elev_path,
         np.flipud(elevation),
-        header=os.linesep.join(header_lines),
+        header=header_text,
         comments="",
     )
 
@@ -289,7 +291,7 @@ def create_ascii_files(dem_info, output_folder, json_str=False, delineation=Fals
     np.savetxt(
         mannings_n_path,
         np.flipud(mannings_n),
-        header=os.linesep.join(header_lines),
+        header=header_text,
         comments="",
     )
 
